@@ -1,22 +1,12 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import AuthButton from '@/components/AuthButton'
+import RealtimeLeaderboard from '@/components/RealtimeLeaderboard'
+import { supabase, isSupabaseConfigured, supabaseHelpers } from '@/lib/supabase-client'
+import { useSupabaseSync } from '@/hooks/useSupabaseSync'
 
-// Supabase will be optional - app works without it
-let supabase: any = null
-
-// Try to import Supabase, but don't break if it's not installed
-try {
-  const { createClient } = require('@supabase/supabase-js')
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-  
-  if (supabaseUrl && supabaseAnonKey) {
-    supabase = createClient(supabaseUrl, supabaseAnonKey)
-  }
-} catch (error) {
-  console.log('Supabase not configured - using localStorage only')
-}
+// Using localStorage for data persistence with optional Supabase sync
 
 interface Prediction {
   id: string
@@ -96,6 +86,90 @@ export default function Probabl() {
   const [selectedBet, setSelectedBet] = useState<any>(null)
   const [betAmount, setBetAmount] = useState('')
   const [userBets, setUserBets] = useState<any[]>([])
+  const [selectedMarket, setSelectedMarket] = useState<any>(null)
+  const [marketPrediction, setMarketPrediction] = useState('')
+  const [showMarketModal, setShowMarketModal] = useState(false)
+  const [isMinting, setIsMinting] = useState(false)
+  const [mintedBadges, setMintedBadges] = useState<string[]>([])
+  const [activeWeeklyChallenge, setActiveWeeklyChallenge] = useState<any>(null)
+  const [weeklyProgress, setWeeklyProgress] = useState<any>({})
+  const [showWeeklyModal, setShowWeeklyModal] = useState(false)
+  const [currentUser, setCurrentUser] = useState<any>(null)
+
+  // Supabase sync hook
+  const { loadFromSupabase } = useSupabaseSync(currentUser?.id, {
+    score: userScore,
+    streak,
+    crowdBeats,
+    badges,
+    mintedBadges,
+    completedChallenges
+  })
+
+  // Check for authenticated user
+  useEffect(() => {
+    const checkUser = async () => {
+      const user = await supabaseHelpers.getUser()
+      setCurrentUser(user)
+      
+      // If user is logged in, load their data from Supabase
+      if (user) {
+        const supabaseData = await loadFromSupabase()
+        if (supabaseData) {
+          // Merge Supabase data with local data
+          if (supabaseData.profile) {
+            setUserScore(supabaseData.profile.score || 0)
+            setStreak(supabaseData.profile.streak || 0)
+            setCrowdBeats(supabaseData.profile.crowd_beats || 0)
+            setUserRank(supabaseData.profile.rank)
+          }
+          if (supabaseData.badges.length > 0) {
+            setBadges(supabaseData.badges as BadgeId[])
+          }
+          if (supabaseData.mintedBadges.length > 0) {
+            setMintedBadges(supabaseData.mintedBadges)
+          }
+          if (supabaseData.completedChallenges.length > 0) {
+            setCompletedChallenges(supabaseData.completedChallenges)
+          }
+        }
+      }
+    }
+    
+    checkUser()
+    
+    // Listen for auth changes
+    if (supabase) {
+      const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+        const user = session?.user || null
+        setCurrentUser(user)
+        
+        if (event === 'SIGNED_IN' && user) {
+          // Load user data when they sign in
+          const supabaseData = await loadFromSupabase()
+          if (supabaseData?.profile) {
+            setUserScore(supabaseData.profile.score || 0)
+            setStreak(supabaseData.profile.streak || 0)
+            setCrowdBeats(supabaseData.profile.crowd_beats || 0)
+            setUserRank(supabaseData.profile.rank)
+          }
+        }
+      })
+      
+      return () => {
+        authListener?.subscription.unsubscribe()
+      }
+    }
+  }, [loadFromSupabase])
+
+  // Load minted badges from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem('mintedBadges')
+    if (stored) {
+      const mints = JSON.parse(stored)
+      setMintedBadges(mints.map((m: any) => m.badgeId))
+    }
+  }, [])
 
   // Badge system with NFT-ready metadata
   const badgeSystem: Record<BadgeId, Badge> = {
@@ -321,6 +395,57 @@ export default function Probabl() {
     })
   }
 
+  // Handle NFT minting simulation
+  const handleMintBadge = async () => {
+    if (!newBadge) return
+    
+    setIsMinting(true)
+    
+    // Simulate blockchain minting process
+    await new Promise(resolve => setTimeout(resolve, 3000))
+    
+    // Generate mock NFT metadata
+    const nftMetadata = {
+      name: newBadge.name,
+      description: newBadge.description,
+      image: `https://probabl.app/badges/${newBadge.name.toLowerCase().replace(/\s+/g, '-')}.png`,
+      attributes: [
+        { trait_type: 'Rarity', value: newBadge.rarity },
+        { trait_type: 'Points', value: newBadge.points },
+        { trait_type: 'Power', value: newBadge.nftMetadata.power },
+        { trait_type: 'Background', value: newBadge.nftMetadata.background },
+        { trait_type: 'Trait', value: newBadge.nftMetadata.trait },
+        { trait_type: 'Earned Date', value: new Date().toISOString() }
+      ],
+      external_url: 'https://probabl.app',
+      background_color: '000000'
+    }
+    
+    // Store minted badge
+    const badgeId = Object.entries(badgeSystem).find(([_, badge]) => badge === newBadge)?.[0]
+    if (badgeId) {
+      setMintedBadges(prev => [...prev, badgeId])
+      
+      // Store in localStorage
+      const storedMints = JSON.parse(localStorage.getItem('mintedBadges') || '[]')
+      storedMints.push({
+        badgeId,
+        metadata: nftMetadata,
+        mintedAt: new Date().toISOString(),
+        txHash: `0x${Math.random().toString(16).substr(2, 64)}` // Mock transaction hash
+      })
+      localStorage.setItem('mintedBadges', JSON.stringify(storedMints))
+    }
+    
+    setIsMinting(false)
+    
+    // Show success message
+    alert(`🎉 Badge minted successfully!\n\nMock Transaction Hash:\n0x${Math.random().toString(16).substr(2, 8)}...\n\nYour ${newBadge.name} badge is now in your collection!`)
+    
+    setShowBadgeModal(false)
+    setNewBadge(null)
+  }
+
   // Generate crowd data for challenges
   const generateCrowdData = (challenge: any) => {
     const participantCount = Math.floor(Math.random() * 50) + 20 // 20-70 participants
@@ -491,11 +616,7 @@ export default function Probabl() {
     }
   ]
 
-  const leaderboard = [
-    { rank: 1, name: "QuantWizard", score: 8420, streak: 12, badge: "🧙‍♂️", achievements: "Legendary Prophet, Bias Slayer, Hall of Fame" },
-    { rank: 2, name: "BiasSlayer", score: 7890, streak: 8, badge: "⚔️", achievements: "Master Calibrator, AI Oracle, Crypto Sage" },
-    { rank: 3, name: "PredictorPro", score: 7650, streak: 15, badge: "🔮", achievements: "Perfect Month, Streak Master, Economics Expert" }
-  ]
+
 
   // Handle challenge answers with crowd comparison
   const handleChallengeAnswer = (challenge: any, answer: any) => {
@@ -619,6 +740,58 @@ export default function Probabl() {
     }
   }
 
+  // Handle market prediction submission
+  const handleMarketPrediction = () => {
+    const prediction = parseInt(marketPrediction)
+    if (isNaN(prediction) || prediction < 0 || prediction > 100) {
+      alert('Please enter a valid percentage between 0 and 100')
+      return
+    }
+
+    // Calculate points based on how close to the average
+    const difference = Math.abs(prediction - selectedMarket.averageGuess)
+    let points = 0
+    let feedback = ''
+
+    if (difference <= 5) {
+      points = 100
+      feedback = '🎯 Excellent! Very close to the crowd consensus!'
+    } else if (difference <= 15) {
+      points = 50
+      feedback = '👍 Good prediction! Reasonably aligned with the crowd.'
+    } else {
+      points = 25
+      feedback = '🤔 Interesting contrarian view! Time will tell if you\'re right.'
+    }
+
+    setUserScore(prev => prev + points)
+    
+    // Store the prediction
+    const newPrediction: Prediction = {
+      id: Date.now().toString(),
+      user_email: userEmail,
+      question: selectedMarket.question,
+      prediction: prediction,
+      confidence: 50,
+      reasoning: selectedMarket.inspiration,
+      bias_check: '',
+      created_at: new Date().toISOString(),
+      status: 'pending',
+      points_earned: points
+    }
+    
+    setPredictions(prev => [...prev, newPrediction])
+    
+    alert(`+${points} points! ${feedback}\n\nYour prediction: ${prediction}%\nCrowd average: ${selectedMarket.averageGuess}%`)
+    
+    setShowMarketModal(false)
+    setSelectedMarket(null)
+    setMarketPrediction('')
+    
+    // Check for badges
+    setTimeout(() => checkForNewBadges(), 500)
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
       {/* Header */}
@@ -636,6 +809,7 @@ export default function Probabl() {
             </div>
             
             <div className="flex items-center space-x-4 md:space-x-6">
+              <AuthButton />
               <div className="text-center">
                 <div className="text-lg md:text-xl font-bold text-green-400">${userScore}</div>
                 <div className="text-xs text-gray-400">Score</div>
@@ -1094,12 +1268,98 @@ export default function Probabl() {
                   <span>🎯 Avg: {market.averageGuess}%</span>
                   <span className="text-green-400">🏆 {market.prize}</span>
                 </div>
-                <button className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold">
-                  Predict
-                </button>
+                <div className="flex items-center justify-between">
+                  <button 
+                    onClick={() => {
+                      setSelectedMarket(market)
+                      setShowMarketModal(true)
+                    }}
+                    className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold"
+                  >
+                    Make Prediction
+                  </button>
+                  {market.yourLastGuess && (
+                    <span className="text-sm text-gray-400">Your last: {market.yourLastGuess}%</span>
+                  )}
+                </div>
+                {market.inspiration && (
+                  <div className="mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                    <p className="text-xs text-blue-300 italic">💡 {market.inspiration}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
+
+          {/* Market Prediction Modal */}
+          {showMarketModal && selectedMarket && (
+            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-2xl font-bold">📊 Make Your Prediction</h3>
+                  <button onClick={() => {
+                    setShowMarketModal(false)
+                    setSelectedMarket(null)
+                    setMarketPrediction('')
+                  }} className="text-gray-400 hover:text-white">✕</button>
+                </div>
+                
+                <div className="mb-6">
+                  <h4 className="text-lg font-bold text-white mb-2">{selectedMarket.question}</h4>
+                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                    <div className="bg-white/5 rounded-xl p-3">
+                      <div className="text-gray-400">Time Left</div>
+                      <div className="font-bold text-white">⏰ {selectedMarket.timeLeft}</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3">
+                      <div className="text-gray-400">Participants</div>
+                      <div className="font-bold text-white">👥 {selectedMarket.participants.toLocaleString()}</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3">
+                      <div className="text-gray-400">Crowd Average</div>
+                      <div className="font-bold text-white">📊 {selectedMarket.averageGuess}%</div>
+                    </div>
+                    <div className="bg-white/5 rounded-xl p-3">
+                      <div className="text-gray-400">Prize</div>
+                      <div className="font-bold text-green-400">{selectedMarket.prize}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Your Prediction (0-100%)
+                    </label>
+                    <input
+                      type="number"
+                      value={marketPrediction}
+                      onChange={(e) => setMarketPrediction(e.target.value)}
+                      min="0"
+                      max="100"
+                      className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center text-2xl"
+                      placeholder="Enter percentage"
+                    />
+                    <div className="mt-2 text-xs text-gray-400 text-center">
+                      The crowd average is {selectedMarket.averageGuess}%. Will you follow or diverge?
+                    </div>
+                  </div>
+                  
+                  {selectedMarket.inspiration && (
+                    <div className="mb-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                      <p className="text-sm text-blue-300">💡 {selectedMarket.inspiration}</p>
+                    </div>
+                  )}
+                  
+                  <button
+                    onClick={handleMarketPrediction}
+                    disabled={!marketPrediction || isNaN(Number(marketPrediction))}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
+                  >
+                    Submit Prediction
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -1118,8 +1378,8 @@ export default function Probabl() {
               <div className="text-sm text-gray-400">Badges Earned</div>
             </div>
             <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
-              <div className="text-2xl font-bold text-green-400">{badges.length}</div>
-              <div className="text-sm text-gray-400">Badges Collected</div>
+              <div className="text-2xl font-bold text-green-400">{mintedBadges.length}</div>
+              <div className="text-sm text-gray-400">NFTs Minted</div>
             </div>
             <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
               <div className="text-2xl font-bold text-yellow-400">{crowdBeats}</div>
@@ -1157,16 +1417,24 @@ export default function Probabl() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {rarityBadges.map(([badgeId, badge]) => {
                     const isEarned = badges.includes(badgeId as BadgeId)
+                    const isMinted = mintedBadges.includes(badgeId)
                     const progress = gameRules.badges[badgeId as BadgeId] ? 
                       (gameRules.badges[badgeId as BadgeId]() ? 100 : Math.min(95, Math.random() * 60 + 20)) : 0
                     
                     return (
                       <div key={badgeId} className={`
-                        bg-white/5 backdrop-blur-xl rounded-xl p-4 border transition-all duration-300
-                        ${isEarned ? 'border-green-500/50 bg-green-500/10' : 'border-white/10'}
+                        bg-white/5 backdrop-blur-xl rounded-xl p-4 border transition-all duration-300 relative overflow-hidden
+                        ${isEarned ? (isMinted ? 'border-purple-500/50 bg-purple-500/10' : 'border-green-500/50 bg-green-500/10') : 'border-white/10'}
                       `}>
+                        {isMinted && (
+                          <div className="absolute top-2 right-2">
+                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                              NFT
+                            </div>
+                          </div>
+                        )}
                         <div className="text-center">
-                          <div className={`text-4xl mb-2 ${isEarned ? '' : 'grayscale opacity-50'}`}>
+                          <div className={`text-4xl mb-2 ${isEarned ? (isMinted ? 'animate-pulse' : '') : 'grayscale opacity-50'}`}>
                             {badge.emoji}
                           </div>
                           <h4 className="font-bold text-white mb-1">{badge.name}</h4>
@@ -1174,12 +1442,31 @@ export default function Probabl() {
                           
                           {isEarned ? (
                             <div className="space-y-2">
-                              <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">
-                                ✅ Owned
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                Achievement unlocked - no monetary value
-                              </div>
+                              {isMinted ? (
+                                <>
+                                  <div className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs">
+                                    ⛓️ Minted NFT
+                                  </div>
+                                  <div className="text-xs text-gray-400">
+                                    On-chain collectible
+                                  </div>
+                                </>
+                              ) : (
+                                <>
+                                  <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">
+                                    ✅ Earned
+                                  </div>
+                                  <button
+                                    onClick={() => {
+                                      setNewBadge(badge)
+                                      setShowBadgeModal(true)
+                                    }}
+                                    className="text-xs text-purple-400 hover:text-purple-300 underline"
+                                  >
+                                    Mint as NFT
+                                  </button>
+                                </>
+                              )}
                             </div>
                           ) : (
                             <div className="space-y-2">
@@ -1219,54 +1506,70 @@ export default function Probabl() {
       {showBadgeModal && newBadge && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
           <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 max-w-md w-full text-center">
-            <div className="text-6xl mb-4">{newBadge.emoji}</div>
-            <h3 className="text-2xl font-bold text-white mb-2">🎉 Badge Earned!</h3>
-            <h4 className="text-xl text-purple-300 mb-4">{newBadge.name}</h4>
-            <p className="text-gray-300 mb-4">{newBadge.description}</p>
-            
-            <div className="bg-white/10 rounded-xl p-4 mb-6">
-              <div className="text-sm text-gray-300 space-y-2">
-                <div><strong>Rarity:</strong> {newBadge.rarity}</div>
-                <div><strong>Digital Collectible:</strong> No guaranteed monetary value</div>
-                <div><strong>Bonus Points:</strong> +{newBadge.points}</div>
+            {!isMinting ? (
+              <>
+                <div className="text-6xl mb-4 animate-bounce">{newBadge.emoji}</div>
+                <h3 className="text-2xl font-bold text-white mb-2">🎉 Badge Earned!</h3>
+                <h4 className="text-xl text-purple-300 mb-4">{newBadge.name}</h4>
+                <p className="text-gray-300 mb-4">{newBadge.description}</p>
+                
+                <div className="bg-white/10 rounded-xl p-4 mb-6">
+                  <div className="text-sm text-gray-300 space-y-2">
+                    <div><strong>Rarity:</strong> <span className={`font-bold ${
+                      newBadge.rarity === 'Common' ? 'text-gray-400' :
+                      newBadge.rarity === 'Uncommon' ? 'text-green-400' :
+                      newBadge.rarity === 'Rare' ? 'text-yellow-400' :
+                      newBadge.rarity === 'Legendary' ? 'text-purple-400' :
+                      'text-pink-400'
+                    }`}>{newBadge.rarity}</span></div>
+                    <div><strong>Digital Collectible:</strong> No guaranteed monetary value</div>
+                    <div><strong>Bonus Points:</strong> <span className="text-green-400 font-bold">+{newBadge.points}</span></div>
+                    <div><strong>Power Level:</strong> <span className="text-blue-400">{newBadge.nftMetadata.power}</span></div>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <button
+                    onClick={handleMintBadge}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300"
+                  >
+                    Mint NFT Badge 🎯
+                  </button>
+                  <button
+                    onClick={() => {
+                      setShowBadgeModal(false)
+                      setNewBadge(null)
+                    }}
+                    className="w-full text-gray-400 hover:text-white text-sm"
+                  >
+                    Skip for now
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="py-8">
+                <div className="text-6xl mb-6 animate-spin">⚡</div>
+                <h3 className="text-2xl font-bold text-white mb-4">Minting Your NFT...</h3>
+                <div className="mb-6">
+                  <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                    <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                  </div>
+                  <p className="text-sm text-gray-400">Simulating blockchain transaction...</p>
+                </div>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>🔗 Connecting to blockchain...</p>
+                  <p>📝 Creating metadata...</p>
+                  <p>🎨 Generating NFT artwork...</p>
+                  <p>⛓️ Confirming transaction...</p>
+                </div>
               </div>
-            </div>
-            
-            <button
-              onClick={() => {
-                setShowBadgeModal(false)
-                setNewBadge(null)
-              }}
-              className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold"
-            >
-              Mint NFT Badge 🎯
-            </button>
+            )}
           </div>
         </div>
       )}
       {activeTab === 'leaderboard' && (
         <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
-          <h2 className="text-3xl font-bold text-center mb-8">🏆 Global Leaderboard</h2>
-          
-          <div className="space-y-4">
-            {leaderboard.map((player) => (
-              <div key={player.rank} className="flex items-center justify-between p-4 bg-white/5 rounded-xl">
-                <div className="flex items-center space-x-4">
-                  <div className="text-2xl">
-                    {player.rank === 1 ? '🥇' : player.rank === 2 ? '🥈' : player.rank === 3 ? '🥉' : `#${player.rank}`}
-                  </div>
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-white">{player.name}</span>
-                      <span className="text-lg">{player.badge}</span>
-                    </div>
-                    <div className="text-sm text-gray-400">{player.achievements}</div>
-                  </div>
-                </div>
-                <div className="text-xl font-bold text-green-400">{player.score.toLocaleString()}</div>
-              </div>
-            ))}
-          </div>
+          <RealtimeLeaderboard />
         </div>
       )}
     </div>
