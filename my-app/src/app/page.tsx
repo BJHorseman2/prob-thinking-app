@@ -3,10 +3,8 @@
 import React, { useState, useEffect } from 'react'
 import AuthButton from '@/components/AuthButton'
 import RealtimeLeaderboard from '@/components/RealtimeLeaderboard'
-import { supabase, isSupabaseConfigured, supabaseHelpers } from '@/lib/supabase-client'
-import { useSupabaseSync } from '@/hooks/useSupabaseSync'
 
-// Using localStorage for data persistence with optional Supabase sync
+// Using localStorage for data persistence
 
 interface Prediction {
   id: string
@@ -94,73 +92,32 @@ export default function Probabl() {
   const [activeWeeklyChallenge, setActiveWeeklyChallenge] = useState<any>(null)
   const [weeklyProgress, setWeeklyProgress] = useState<any>({})
   const [showWeeklyModal, setShowWeeklyModal] = useState(false)
-  const [currentUser, setCurrentUser] = useState<any>(null)
-
-  // Supabase sync hook
-  const { loadFromSupabase } = useSupabaseSync(currentUser?.id, {
-    score: userScore,
-    streak,
-    crowdBeats,
-    badges,
-    mintedBadges,
-    completedChallenges
-  })
-
-  // Check for authenticated user
+  // Load data from localStorage
   useEffect(() => {
-    const checkUser = async () => {
-      const user = await supabaseHelpers.getUser()
-      setCurrentUser(user)
-      
-      // If user is logged in, load their data from Supabase
-      if (user) {
-        const supabaseData = await loadFromSupabase()
-        if (supabaseData) {
-          // Merge Supabase data with local data
-          if (supabaseData.profile) {
-            setUserScore(supabaseData.profile.score || 0)
-            setStreak(supabaseData.profile.streak || 0)
-            setCrowdBeats(supabaseData.profile.crowd_beats || 0)
-            setUserRank(supabaseData.profile.rank)
-          }
-          if (supabaseData.badges.length > 0) {
-            setBadges(supabaseData.badges as BadgeId[])
-          }
-          if (supabaseData.mintedBadges.length > 0) {
-            setMintedBadges(supabaseData.mintedBadges)
-          }
-          if (supabaseData.completedChallenges.length > 0) {
-            setCompletedChallenges(supabaseData.completedChallenges)
-          }
-        }
-      }
+    const stored = localStorage.getItem('gameData')
+    if (stored) {
+      const data = JSON.parse(stored)
+      setUserScore(data.score || 0)
+      setStreak(data.streak || 0)
+      setCrowdBeats(data.crowdBeats || 0)
+      setBadges(data.badges || [])
+      setCompletedChallenges(data.completedChallenges || [])
+      setUserRank(data.rank || null)
     }
-    
-    checkUser()
-    
-    // Listen for auth changes
-    if (supabase) {
-      const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-        const user = session?.user || null
-        setCurrentUser(user)
-        
-        if (event === 'SIGNED_IN' && user) {
-          // Load user data when they sign in
-          const supabaseData = await loadFromSupabase()
-          if (supabaseData?.profile) {
-            setUserScore(supabaseData.profile.score || 0)
-            setStreak(supabaseData.profile.streak || 0)
-            setCrowdBeats(supabaseData.profile.crowd_beats || 0)
-            setUserRank(supabaseData.profile.rank)
-          }
-        }
-      })
-      
-      return () => {
-        authListener?.subscription.unsubscribe()
-      }
+  }, [])
+
+  // Save data to localStorage
+  useEffect(() => {
+    const data = {
+      score: userScore,
+      streak,
+      crowdBeats,
+      badges,
+      completedChallenges,
+      rank: userRank
     }
-  }, [loadFromSupabase])
+    localStorage.setItem('gameData', JSON.stringify(data))
+  }, [userScore, streak, crowdBeats, badges, completedChallenges, userRank])
 
   // Load minted badges from localStorage on mount
   useEffect(() => {
@@ -798,40 +755,47 @@ export default function Probabl() {
       <div className="bg-black/20 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="text-2xl">🎯</div>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <div className="text-xl md:text-2xl">🎯</div>
               <div>
-                <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
                   Probabl
                 </h1>
-                <p className="text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
+                <p className="hidden md:block text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
               </div>
             </div>
             
-            <div className="flex items-center space-x-4 md:space-x-6">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <AuthButton />
-              <div className="text-center">
-                <div className="text-lg md:text-xl font-bold text-green-400">${userScore}</div>
+              <div className="hidden sm:flex items-center space-x-2 md:space-x-4">
+                <div className="text-center">
+                  <div className="text-sm md:text-lg font-bold text-green-400">${userScore}</div>
+                  <div className="text-xs text-gray-400">Score</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm md:text-lg font-bold text-yellow-400">
+                    {userRank ? `#${userRank}` : 'Unranked'}
+                  </div>
+                  <div className="text-xs text-gray-400">Rank</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-sm md:text-lg font-bold text-orange-400">
+                    {streak > 0 ? `${streak}🔥` : '0'}
+                  </div>
+                  <div className="text-xs text-gray-400">Streak</div>
+                </div>
+                {activeTab === 'challenges' && gameMode === 'crowd' && (
+                  <div className="text-center">
+                    <div className="text-sm md:text-lg font-bold text-purple-400">{crowdBeats}🎯</div>
+                    <div className="text-xs text-gray-400">Crowd Beats</div>
+                  </div>
+                )}
+              </div>
+              {/* Mobile score only */}
+              <div className="sm:hidden text-center">
+                <div className="text-sm font-bold text-green-400">${userScore}</div>
                 <div className="text-xs text-gray-400">Score</div>
               </div>
-              <div className="text-center">
-                <div className="text-lg md:text-xl font-bold text-yellow-400">
-                  {userRank ? `#${userRank}` : 'Unranked'}
-                </div>
-                <div className="text-xs text-gray-400">Rank</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg md:text-xl font-bold text-orange-400">
-                  {streak > 0 ? `${streak}🔥` : '0'}
-                </div>
-                <div className="text-xs text-gray-400">Streak</div>
-              </div>
-              {activeTab === 'challenges' && gameMode === 'crowd' && (
-                <div className="text-center">
-                  <div className="text-lg md:text-xl font-bold text-purple-400">{crowdBeats}🎯</div>
-                  <div className="text-xs text-gray-400">Crowd Beats</div>
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -853,23 +817,23 @@ export default function Probabl() {
             
             {/* Quick Demo */}
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 max-w-2xl mx-auto mb-16">
-              <h3 className="text-2xl font-bold mb-6 text-center">⚡ Kahneman's Famous Puzzle</h3>
+              <h3 className="text-2xl font-bold mb-6 text-center">⚡ Loss Aversion Demo</h3>
               <div className="text-lg text-gray-300 mb-6">
-                <strong>"A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?"</strong>
+                <strong>"Would you rather have a guaranteed $500, or a 50% chance to win $1,100?"</strong>
               </div>
               
               <div className="grid grid-cols-2 gap-4 mb-6">
                 <button 
-                  onClick={() => alert('❌ Your "System 1" (fast thinking) screamed this answer! But if the ball costs 10¢ and the bat costs $1 more (110¢), the total would be 120¢. The ball actually costs 5¢. From Kahneman\'s "Thinking, Fast and Slow" - our intuitive mind often tricks us! +0 points, try again?')}
+                  onClick={() => alert('❌ Classic loss aversion! The 50% bet has an expected value of $550, which is MORE than $500. But your brain hates the risk of getting nothing. This irrational fear costs investors millions! Nobel laureate Kahneman proved we feel losses twice as strongly as gains. +0 points, try the math!')}
                   className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
                 >
-                  💭 10 cents
+                  💵 Take $500
                 </button>
                 <button 
-                  onClick={() => alert('🎉 Correct! You beat your System 1 (fast thinking)! Most people say 10¢ because it feels right, but that would make the total $1.20. Your System 2 (slow thinking) caught the error. This is the core of behavioral economics - our brains have shortcuts that often mislead us! +75 points!')}
+                  onClick={() => alert('🎉 Brilliant! You did the math: 50% × $1,100 = $550 expected value, which beats $500. Most people can\'t do this - loss aversion makes them take the "safe" but WORSE option. You just demonstrated the kind of thinking that wins in markets! +75 points!')}
                   className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
                 >
-                  🧠 5 cents
+                  🎲 Take the bet
                 </button>
               </div>
               
