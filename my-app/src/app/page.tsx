@@ -1,8 +1,10 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import AuthButton from '@/components/AuthButton'
 import RealtimeLeaderboard from '@/components/RealtimeLeaderboard'
+import { fireWinConfetti, fireConfetti } from '@/lib/confetti'
 
 // Using localStorage for data persistence
 
@@ -752,13 +754,19 @@ export default function Probabl() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-xl border-b border-white/10">
+      <div className="bg-black/20 backdrop-blur-xl border-b border-white/10 animate-fadeIn">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 md:space-x-4">
-              <div className="text-xl md:text-2xl">🎯</div>
-              <div>
-                <h1 className="text-lg md:text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+              <motion.div 
+                className="text-xl md:text-2xl"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, delay: 0.5 }}
+              >
+                🎯
+              </motion.div>
+              <div className="animate-slideInRight">
+                <h1 className="text-lg md:text-xl font-bold gradient-text-animate">
                   Probabl
                 </h1>
                 <p className="hidden md:block text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
@@ -802,18 +810,25 @@ export default function Probabl() {
       </div>
 
       {/* Hero Section */}
-      {activeTab === 'home' && (
-        <div className="max-w-6xl mx-auto px-4 md:px-8 py-12">
-          <div className="text-center mb-16">
-            <div className="text-6xl mb-6">🧠💰</div>
-            <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-              Can You Beat Your Own Brain?
-            </h2>
-            <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto">
-              Predict the future. Outsmart cognitive biases. Earn legendary badges.
-              <br />
-              <span className="text-purple-400 font-semibold">Master the behavioral economics insights that win Nobel Prizes.</span>
-            </p>
+      <AnimatePresence mode="wait">
+        {activeTab === 'home' && (
+          <motion.div 
+            className="max-w-6xl mx-auto px-4 md:px-8 py-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="text-center mb-16">
+              <div className="text-6xl mb-6 animate-float">🧠💰</div>
+              <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-fadeInUp">
+                Can You Beat Your Own Brain?
+              </h2>
+              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto animate-fadeInUp stagger-1">
+                Predict the future. Outsmart cognitive biases. Earn legendary badges.
+                <br />
+                <span className="text-purple-400 font-semibold">Master the behavioral economics insights that win Nobel Prizes.</span>
+              </p>
             
             {/* Quick Demo */}
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 max-w-2xl mx-auto mb-16">
@@ -850,8 +865,9 @@ export default function Probabl() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
+    </AnimatePresence>
 
       {/* Navigation */}
       <div className="flex justify-center space-x-2 mb-8 px-4">
@@ -920,14 +936,19 @@ export default function Probabl() {
           )}
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {quickChallenges.map((challenge) => {
+            {quickChallenges.map((challenge, index) => {
               const isCompleted = completedChallenges.includes(challenge.id)
               return (
-                <div key={challenge.id} className={`
-                  bg-white/5 backdrop-blur-xl rounded-2xl p-6 border transition-all duration-300 cursor-pointer
-                  ${isCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 hover:border-purple-500/50'}
-                `}
-                     onClick={() => !isCompleted && setSelectedChallenge(challenge)}>
+                <motion.div 
+                  key={challenge.id} 
+                  className={`
+                    bg-white/5 backdrop-blur-xl rounded-2xl p-6 border cursor-pointer hover-lift animate-scaleIn
+                    ${isCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 hover:border-purple-500/50 hover-glow'}
+                  `}
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => !isCompleted && setSelectedChallenge(challenge)}>
                   <div className="flex justify-between items-start mb-4">
                     <h3 className="text-lg font-bold text-white">{challenge.title}</h3>
                     <div className="flex items-center space-x-2">
@@ -942,7 +963,7 @@ export default function Probabl() {
                       {isCompleted ? 'Completed' : 'Play →'}
                     </span>
                   </div>
-                </div>
+                </motion.div>
               )
             })}
           </div>
@@ -955,9 +976,28 @@ export default function Probabl() {
           </div>
 
           {/* Challenge Modal */}
-          {selectedChallenge && !showCrowdResults && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full">
+          <AnimatePresence>
+            {selectedChallenge && !showCrowdResults && (
+              <motion.div 
+                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => {
+                  setSelectedChallenge(null)
+                  setShowCrowdResults(false)
+                  setCrowdData(null)
+                  setLastResult(null)
+                }}
+              >
+                <motion.div 
+                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full"
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  onClick={(e) => e.stopPropagation()}
+                >
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-2xl font-bold">{selectedChallenge.title}</h3>
                   <button onClick={() => {

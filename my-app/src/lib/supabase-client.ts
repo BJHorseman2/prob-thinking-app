@@ -1,13 +1,19 @@
-import { createClient } from '@supabase/supabase-js'
-
 // Supabase configuration with fallback
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
 
-// Only create client if both values exist
-export const supabase = supabaseUrl && supabaseAnonKey 
-  ? createClient(supabaseUrl, supabaseAnonKey)
-  : null
+// Dynamic import to avoid build errors when Supabase is not installed
+let supabase: any = null
+
+if (typeof window !== 'undefined' && supabaseUrl && supabaseAnonKey) {
+  import('@supabase/supabase-js').then(({ createClient }) => {
+    supabase = createClient(supabaseUrl, supabaseAnonKey)
+  }).catch(() => {
+    console.log('Supabase not available, using localStorage only')
+  })
+}
+
+export { supabase }
 
 // Helper to check if Supabase is configured
 export const isSupabaseConfigured = () => {
