@@ -5,6 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import AuthButton from '@/components/AuthButton'
 import RealtimeLeaderboard from '@/components/RealtimeLeaderboard'
 import { fireWinConfetti, fireConfetti } from '@/lib/confetti'
+import OnboardingTutorial from '@/components/OnboardingTutorial'
+import ProgressDashboard from '@/components/ProgressDashboard'
+import AnimatedScore from '@/components/AnimatedScore'
+import { useAchievementToast } from '@/components/AchievementToast'
+import { getWeeklyChallenges, getNextWeeksChallenges, hasCompletedThisWeek, getDaysUntilNextWeek } from '@/lib/weeklyChallenges'
+import SocialChallenge from '@/components/SocialChallenge'
+import ShareableResultCard from '@/components/ShareableResultCard'
+import TikTokChallenge from '@/components/TikTokChallenge'
+import MobileLayout from '@/components/MobileLayout'
 
 // Using localStorage for data persistence
 
@@ -63,6 +72,7 @@ export default function Probabl() {
   // All state variables
   const [activeTab, setActiveTab] = useState('home')
   const [userEmail, setUserEmail] = useState('')
+  const [challengeMode, setChallengeMode] = useState<{active: boolean, challengerId: string, challengerName: string, targetScore: number} | null>(null)
   const [selectedChallenge, setSelectedChallenge] = useState<any>(null)
   const [userAnswer, setUserAnswer] = useState('')
   const [confidence, setConfidence] = useState(50)
@@ -94,6 +104,12 @@ export default function Probabl() {
   const [activeWeeklyChallenge, setActiveWeeklyChallenge] = useState<any>(null)
   const [weeklyProgress, setWeeklyProgress] = useState<any>({})
   const [showWeeklyModal, setShowWeeklyModal] = useState(false)
+  const [completedMarkets, setCompletedMarkets] = useState<number[]>([])
+  const [showTikTokMode, setShowTikTokMode] = useState(false)
+  
+  // Achievement toast hook
+  const { showAchievement, AchievementToastComponent } = useAchievementToast()
+  
   // Load data from localStorage
   useEffect(() => {
     const stored = localStorage.getItem('gameData')
@@ -104,11 +120,29 @@ export default function Probabl() {
       setCrowdBeats(data.crowdBeats || 0)
       setBadges(data.badges || [])
       setCompletedChallenges(data.completedChallenges || [])
+      setCompletedMarkets(data.completedMarkets || [])
       setUserRank(data.rank || null)
+    }
+    
+    // Check for challenge in URL
+    const urlParams = new URLSearchParams(window.location.search)
+    const challengeId = urlParams.get('challenge')
+    const challengerName = urlParams.get('challenger')
+    const targetScore = urlParams.get('score')
+    
+    if (challengeId && challengerName && targetScore) {
+      setChallengeMode({
+        active: true,
+        challengerId: challengeId,
+        challengerName: decodeURIComponent(challengerName),
+        targetScore: parseInt(targetScore)
+      })
+      // Show challenge notification
+      alert(`🎯 Challenge from ${decodeURIComponent(challengerName)}!\n\nBeat their score of ${targetScore} points to win!`)
     }
   }, [])
 
-  // Save data to localStorage
+  // Save data to localStorage and update leaderboard
   useEffect(() => {
     const data = {
       score: userScore,
@@ -116,10 +150,36 @@ export default function Probabl() {
       crowdBeats,
       badges,
       completedChallenges,
+      completedMarkets,
       rank: userRank
     }
     localStorage.setItem('gameData', JSON.stringify(data))
-  }, [userScore, streak, crowdBeats, badges, completedChallenges, userRank])
+    
+    // Submit to leaderboard API if score > 0
+    if (userScore > 0 && userEmail) {
+      const submitToLeaderboard = async () => {
+        try {
+          const response = await fetch('/api/leaderboard', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              id: userEmail,
+              name: userEmail.split('@')[0],
+              score: userScore,
+              badges: badges
+            })
+          })
+          const result = await response.json()
+          if (result.rank) {
+            setUserRank(result.rank)
+          }
+        } catch (error) {
+          console.error('Failed to update leaderboard:', error)
+        }
+      }
+      submitToLeaderboard()
+    }
+  }, [userScore, streak, crowdBeats, badges, completedChallenges, completedMarkets, userRank, userEmail])
 
   // Load minted badges from localStorage on mount
   useEffect(() => {
@@ -350,6 +410,17 @@ export default function Probabl() {
         
         // Add bonus points for earning badge
         setUserScore(prev => prev + badgeSystem[badgeId].points)
+        
+        // Show achievement toast
+        const badge = badgeSystem[badgeId]
+        showAchievement({
+          id: badgeId,
+          title: `${badge.name} Unlocked!`,
+          description: badge.description,
+          icon: badge.emoji,
+          points: badge.points,
+          rarity: badge.rarity.toLowerCase() as 'common' | 'rare' | 'epic' | 'legendary'
+        })
       }
     })
   }
@@ -497,56 +568,18 @@ export default function Probabl() {
       "Initial reaction usually guides the choice"
     ]
   }
-  const quickChallenges = [
-    {
-      id: 'kahneman-fast-slow',
-      title: '🧠 Kahneman\'s Two Systems',
-      description: 'Can you resist System 1 thinking?',
-      timeToComplete: '2 min',
-      points: 75,
-      question: 'A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost?',
-      type: 'estimate',
-      correctAnswer: 5, // 5 cents
-      explanation: 'Your System 1 (fast thinking) screams "10 cents!" But that\'s wrong. If the ball costs 10¢ and the bat costs $1 more (110¢), the total would be 120¢. The ball actually costs 5¢. This is from Kahneman\'s "Thinking, Fast and Slow" - our intuitive mind often gives us the wrong answer.',
-      hint: 'Think in cents, not dollars'
-    },
-    {
-      id: 'thaler-endowment',
-      title: '🎫 Thaler\'s Endowment Effect',
-      description: 'How much do you value what you own?',
-      timeToComplete: '90 sec',
-      points: 60,
-      question: 'You just won a concert ticket worth $100 in a lottery. Minutes later, someone offers to buy it from you. What\'s the minimum you\'d accept?',
-      type: 'estimate',
-      correctAnswer: 100,
-      explanation: 'Most people demand $150+ to sell something they just got for free! This is Thaler\'s "endowment effect" - we overvalue things simply because we own them. Rational? No. Human? Absolutely.',
-      anchor: 100
-    },
-    {
-      id: 'duke-outcome-bias',
-      title: '🎲 Annie Duke\'s Outcome Bias',
-      description: 'Can you judge the decision, not the result?',
-      timeToComplete: '2 min',
-      points: 80,
-      question: 'A CEO decides to launch a risky new product with a 30% chance of success but huge upside. It fails spectacularly. The board fires him. Was this the right decision?',
-      type: 'choice',
-      options: ['Fire him - the product failed', 'Keep him - it was a good bet'],
-      correctAnswer: 'Keep him - it was a good bet',
-      explanation: 'Annie Duke calls this "resulting" - judging decisions by outcomes instead of process. The CEO made a GOOD decision with the information available: a 30% chance of huge upside is often worth taking! Yes, it failed, but that was expected 70% of the time. Firing him punishes good decision-making just because of an unlucky outcome. This bias destroys rational thinking in business, poker, and life.',
-    },
-    {
-      id: 'kahneman-availability',
-      title: '📺 Availability Heuristic',
-      description: 'What kills more Americans yearly?',
-      timeToComplete: '1 min',
-      points: 50,
-      question: 'Which kills more people in the US each year: shark attacks or falling airplane parts?',
-      type: 'choice',
-      options: ['Shark attacks', 'Falling airplane parts'],
-      correctAnswer: 'Falling airplane parts',
-      explanation: 'Falling airplane parts kill ~25 people/year, sharks kill ~1. But shark attacks get massive media coverage! Kahneman showed we judge probability by how easily examples come to mind. The news makes rare dramatic events feel common.'
-    }
-  ]
+  // Get this week's challenges
+  const [quickChallenges, setQuickChallenges] = useState<any[]>([])
+  const [allWeekCompleted, setAllWeekCompleted] = useState(false)
+  
+  useEffect(() => {
+    const challenges = getWeeklyChallenges()
+    setQuickChallenges(challenges)
+    
+    // Check if all this week's challenges are completed
+    const completed = hasCompletedThisWeek(completedChallenges)
+    setAllWeekCompleted(completed)
+  }, [completedChallenges])
 
   const liveMarkets = [
     {
@@ -659,6 +692,8 @@ export default function Probabl() {
     
     if (beatCrowd) {
       setCrowdBeats(prev => prev + 1)
+      // Fire confetti for beating the crowd
+      fireConfetti()
     }
 
     // Mark challenge as completed to prevent re-doing
@@ -701,6 +736,15 @@ export default function Probabl() {
 
   // Handle market prediction submission
   const handleMarketPrediction = () => {
+    // Check if user has already predicted on this market
+    if (completedMarkets.includes(selectedMarket.id)) {
+      alert('⚠️ You have already made a prediction on this market!\n\nYou can only predict once per market to keep the game fair.')
+      setShowMarketModal(false)
+      setSelectedMarket(null)
+      setMarketPrediction('')
+      return
+    }
+
     const prediction = parseInt(marketPrediction)
     if (isNaN(prediction) || prediction < 0 || prediction > 100) {
       alert('Please enter a valid percentage between 0 and 100')
@@ -724,6 +768,9 @@ export default function Probabl() {
     }
 
     setUserScore(prev => prev + points)
+    
+    // Mark this market as completed
+    setCompletedMarkets(prev => [...prev, selectedMarket.id])
     
     // Store the prediction
     const newPrediction: Prediction = {
@@ -752,6 +799,24 @@ export default function Probabl() {
   }
 
   return (
+    <MobileLayout
+      onSwipeUp={() => {
+        // Navigate to next tab
+        const tabs = ['home', 'challenges', 'markets', 'progress', 'badges', 'leaderboard']
+        const currentIndex = tabs.indexOf(activeTab)
+        if (currentIndex < tabs.length - 1) {
+          setActiveTab(tabs[currentIndex + 1])
+        }
+      }}
+      onSwipeDown={() => {
+        // Navigate to previous tab
+        const tabs = ['home', 'challenges', 'markets', 'progress', 'badges', 'leaderboard']
+        const currentIndex = tabs.indexOf(activeTab)
+        if (currentIndex > 0) {
+          setActiveTab(tabs[currentIndex - 1])
+        }
+      }}
+    >
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-xl border-b border-white/10 animate-fadeIn">
@@ -775,9 +840,24 @@ export default function Probabl() {
             
             <div className="flex items-center space-x-2 md:space-x-4">
               <AuthButton />
-              <div className="hidden sm:flex items-center space-x-2 md:space-x-4">
+              {/* Social Features */}
+              <div className="hidden md:flex items-center space-x-2">
+                <SocialChallenge userScore={userScore} userName={userEmail || 'Player'} />
+                <ShareableResultCard 
+                  score={userScore} 
+                  rank={userRank} 
+                  topBias="Loss Aversion"
+                  accuracy={Math.round((badges.length / Object.keys(badgeSystem).length) * 100)}
+                  badges={badges}
+                />
+              </div>
+              <div className="hidden sm:flex items-center space-x-2 md:space-x-4" id="score-display">
                 <div className="text-center">
-                  <div className="text-sm md:text-lg font-bold text-green-400">${userScore}</div>
+                  <AnimatedScore 
+                    value={userScore} 
+                    prefix="$" 
+                    className="text-sm md:text-lg font-bold text-green-400"
+                  />
                   <div className="text-xs text-gray-400">Score</div>
                 </div>
                 <div className="text-center">
@@ -808,6 +888,20 @@ export default function Probabl() {
           </div>
         </div>
       </div>
+
+      {/* Challenge Mode Banner */}
+      {challengeMode && (
+        <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-6 text-center">
+          <p className="text-lg font-bold">
+            🎯 Challenge Mode Active! Beat {challengeMode.challengerName}'s score of {challengeMode.targetScore} points!
+          </p>
+          {userScore >= challengeMode.targetScore && (
+            <p className="text-sm mt-2">
+              🎉 Congratulations! You've beaten the challenge! Share your victory!
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Hero Section */}
       <AnimatePresence mode="wait">
@@ -860,7 +954,17 @@ export default function Probabl() {
                   onClick={() => setActiveTab('challenges')}
                   className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300"
                 >
-                  Play Today's 4 Daily Challenges 🧠
+                  Play This Week's 4 Challenges 🧠
+                </button>
+                
+                {/* TikTok Mode Button - Mobile Only */}
+                <button 
+                  onClick={() => setShowTikTokMode(true)}
+                  className="md:hidden mt-4 bg-black border-2 border-white text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300 flex items-center justify-center space-x-2"
+                >
+                  <span>🎵</span>
+                  <span>TikTok Mode</span>
+                  <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">NEW</span>
                 </button>
               </div>
             </div>
@@ -869,12 +973,13 @@ export default function Probabl() {
       )}
     </AnimatePresence>
 
-      {/* Navigation */}
-      <div className="flex justify-center space-x-2 mb-8 px-4">
+      {/* Desktop Navigation */}
+      <div className="desktop-nav flex justify-center space-x-2 mb-8 px-4 flex-wrap">
         {[
           { id: 'home', label: '🏠 Home' },
           { id: 'challenges', label: '⚡ Quick Challenges' },
           { id: 'markets', label: '📈 Live Markets' },
+          { id: 'progress', label: '📊 Progress' },
           { id: 'badges', label: '🏆 Badge Collection' },
           { id: 'leaderboard', label: '👑 Leaderboard' }
         ].map((tab) => (
@@ -892,11 +997,37 @@ export default function Probabl() {
         ))}
       </div>
 
+      {/* Mobile Navigation */}
+      <div className="mobile-nav">
+        <div className="flex justify-around items-center w-full px-4">
+          {[
+            { id: 'home', icon: '🏠', label: 'Home' },
+            { id: 'challenges', icon: '⚡', label: 'Play' },
+            { id: 'markets', icon: '📈', label: 'Markets' },
+            { id: 'badges', icon: '🏆', label: 'Badges' },
+            { id: 'leaderboard', icon: '👑', label: 'Rank' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all ${
+                activeTab === tab.id
+                  ? 'text-purple-400'
+                  : 'text-gray-400'
+              }`}
+            >
+              <span className="text-xl mb-1">{tab.icon}</span>
+              <span className="text-xs">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Quick Challenges */}
       {activeTab === 'challenges' && (
         <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
           <h2 className="text-3xl font-bold text-center mb-4">⚡ Behavioral Economics Challenges</h2>
-          <p className="text-center text-gray-300 mb-6">Test your brain against the Nobel Prize-winning insights of Kahneman, Thaler, and Annie Duke.</p>
+          <p className="text-center text-gray-300 mb-6">Test your brain against Nobel Prize winners Kahneman & Thaler, plus decision strategist Annie Duke.</p>
           
           {/* Mode Selector */}
           <div className="flex justify-center mb-8">
@@ -968,11 +1099,32 @@ export default function Probabl() {
             })}
           </div>
 
-          {/* Daily refresh notice */}
+          {/* Weekly refresh notice */}
           <div className="text-center mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-            <p className="text-sm text-gray-300">
-              🔄 Challenges refresh daily at midnight. Come back tomorrow for 4 new questions!
-            </p>
+            {allWeekCompleted ? (
+              <div>
+                <p className="text-sm text-green-400 font-semibold mb-2">
+                  ✅ Great job! You've completed all of this week's challenges!
+                </p>
+                <p className="text-sm text-gray-300">
+                  🔄 Come back in {getDaysUntilNextWeek()} days for 4 new behavioral economics puzzles.
+                </p>
+                <button 
+                  onClick={() => {
+                    const nextWeek = getNextWeeksChallenges()
+                    const titles = nextWeek.map((c: any) => c.title).join(', ')
+                    alert(`Next week's challenges: ${titles}`)
+                  }}
+                  className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
+                >
+                  Preview next week's challenges →
+                </button>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-300">
+                🔄 Challenges refresh weekly every Monday. Complete all 4 challenges before the week ends!
+              </p>
+            )}
           </div>
 
           {/* Challenge Modal */}
@@ -1054,9 +1206,10 @@ export default function Probabl() {
                     </div>
                   )}
                 </div>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           )}
+        </AnimatePresence>
 
           {/* Betting Modal */}
           {selectedBet && (
@@ -1260,39 +1413,58 @@ export default function Probabl() {
       {activeTab === 'markets' && (
         <div className="max-w-6xl mx-auto px-4 md:px-8 pb-12">
           <h2 className="text-3xl font-bold text-center mb-8">📈 Live Prediction Markets</h2>
-          <p className="text-center text-gray-300 mb-12">Predict real events. Compete with thousands. Win bigger badges.</p>
+          <p className="text-center text-gray-300 mb-6">Predict real events. Compete with thousands. Win bigger badges.</p>
+          
+          {/* One prediction per market notice */}
+          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
+            <p className="text-sm text-yellow-300 text-center">
+              ⚠️ <strong>Fair Play Rule:</strong> You can only make one prediction per market. Choose wisely!
+            </p>
+          </div>
           
           <div className="space-y-6">
-            {liveMarkets.map((market) => (
-              <div key={market.id} className="bg-white/5 backdrop-blur-xl rounded-2xl p-6 border border-white/10">
-                <h3 className="text-lg font-bold text-white mb-2">{market.question}</h3>
-                <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
-                  <span>⏰ {market.timeLeft}</span>
-                  <span>👥 {market.participants.toLocaleString()} players</span>
-                  <span>🎯 Avg: {market.averageGuess}%</span>
-                  <span className="text-green-400">🏆 {market.prize}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <button 
-                    onClick={() => {
-                      setSelectedMarket(market)
-                      setShowMarketModal(true)
-                    }}
-                    className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold"
-                  >
-                    Make Prediction
-                  </button>
-                  {market.yourLastGuess && (
-                    <span className="text-sm text-gray-400">Your last: {market.yourLastGuess}%</span>
+            {liveMarkets.map((market) => {
+              const hasCompleted = completedMarkets.includes(market.id)
+              return (
+                <div key={market.id} className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border ${hasCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10'}`}>
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-lg font-bold text-white">{market.question}</h3>
+                    {hasCompleted && <span className="text-green-400 text-lg">✅</span>}
+                  </div>
+                  <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
+                    <span>⏰ {market.timeLeft}</span>
+                    <span>👥 {market.participants.toLocaleString()} players</span>
+                    <span>🎯 Avg: {market.averageGuess}%</span>
+                    <span className="text-green-400">🏆 {market.prize}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    {!hasCompleted ? (
+                      <button 
+                        onClick={() => {
+                          setSelectedMarket(market)
+                          setShowMarketModal(true)
+                        }}
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold"
+                      >
+                        Make Prediction
+                      </button>
+                    ) : (
+                      <span className="text-sm text-green-400 font-semibold">
+                        ✅ Prediction Submitted
+                      </span>
+                    )}
+                    {market.yourLastGuess && (
+                      <span className="text-sm text-gray-400">Your last: {market.yourLastGuess}%</span>
+                    )}
+                  </div>
+                  {market.inspiration && (
+                    <div className="mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                      <p className="text-xs text-blue-300 italic">💡 {market.inspiration}</p>
+                    </div>
                   )}
                 </div>
-                {market.inspiration && (
-                  <div className="mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                    <p className="text-xs text-blue-300 italic">💡 {market.inspiration}</p>
-                  </div>
-                )}
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Market Prediction Modal */}
@@ -1576,6 +1748,36 @@ export default function Probabl() {
           <RealtimeLeaderboard />
         </div>
       )}
+
+      {/* Progress Dashboard */}
+      {activeTab === 'progress' && (
+        <ProgressDashboard
+          userScore={userScore}
+          userRank={userRank}
+          streak={streak}
+          badges={badges}
+          crowdBeats={crowdBeats}
+          predictions={predictions}
+        />
+      )}
+
+      {/* Onboarding Tutorial */}
+      <OnboardingTutorial />
+
+      {/* Achievement Toast */}
+      <AchievementToastComponent />
+      
+      {/* TikTok Mode */}
+      {showTikTokMode && (
+        <TikTokChallenge 
+          onComplete={(points) => {
+            setUserScore(prev => prev + points)
+            setShowTikTokMode(false)
+            alert(`🎉 TikTok Challenge Complete! +${points} points!`)
+          }}
+        />
+      )}
     </div>
+    </MobileLayout>
   )
 }
