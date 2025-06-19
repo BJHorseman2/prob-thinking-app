@@ -1,95 +1,36 @@
-# Probabl - Behavioral Economics Challenge App
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-A gamified web application that helps users understand and overcome cognitive biases through behavioral economics challenges inspired by Nobel Prize-winning research from Daniel Kahneman, Richard Thaler, and insights from Annie Duke.
+## Getting Started
 
-## 🎯 Features
+First, run the development server:
 
-- **Behavioral Economics Challenges**: Test your decision-making against classic cognitive biases
-- **NFT Badge Collection**: Earn digital collectible badges (no monetary value) as you progress
-- **Crowd Comparison Mode**: See how your answers compare to other players
-- **Score & Ranking System**: Track your progress with points, ranks, and streaks
-- **Educational Content**: Learn from Nobel Prize-winning behavioral economics research
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 18+ 
-- npm or yarn
-
-### Installation
-
-1. Clone the repository:
-```bash
-git clone [your-repo-url]
-cd prob-thinking-app
-```
-
-2. Install dependencies:
-```bash
-cd my-app
-npm install
-```
-
-3. Run the development server:
 ```bash
 npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
 ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## 🧠 Challenge Types
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-### Quick Challenges
-- **Kahneman's Two Systems**: The famous bat & ball problem testing System 1 vs System 2 thinking
-- **Thaler's Endowment Effect**: Experience how ownership affects valuation
-- **Annie Duke's Outcome Bias**: Learn to judge decisions by process, not results
-- **Availability Heuristic**: Understand how media coverage affects risk perception
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-### Game Modes
-- **Solo Training**: Practice at your own pace
-- **Beat the Crowd**: Compare your answers to other players and earn bonus points
+## Learn More
 
-## 🏆 Badge System
+To learn more about Next.js, take a look at the following resources:
 
-Earn NFT-ready badges across different rarity tiers:
-- **Common** (Bronze): Beginner achievements
-- **Uncommon** (Silver): Intermediate milestones  
-- **Rare** (Gold): Advanced accomplishments
-- **Legendary** (Diamond): Elite achievements
-- **Mythic**: Ultimate mastery
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-*Note: Badges are digital collectibles with no guaranteed monetary value*
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## 🛠️ Tech Stack
+## Deploy on Vercel
 
-- **Frontend**: Next.js 15.3 with TypeScript
-- **Styling**: Tailwind CSS
-- **State Management**: React hooks
-- **Database**: Supabase (optional - app works with localStorage)
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## 📝 Current Status
-
-✅ Core gameplay mechanics implemented  
-✅ TypeScript fully integrated with proper types  
-✅ All linter errors resolved  
-✅ Responsive UI design  
-⚠️ Supabase integration pending (app works without it)  
-
-## 🔄 Version Control
-
-This project uses Git for version control. Your progress has been saved in the initial commit.
-
-To save future changes:
-```bash
-git add .
-git commit -m "Your commit message"
-```
-
-## 🤝 Contributing
-
-Feel free to submit issues and enhancement requests!
-
-## 📄 License
-
-This project is for educational purposes. 
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
