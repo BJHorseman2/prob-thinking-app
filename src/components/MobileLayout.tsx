@@ -1,7 +1,6 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { motion, useMotionValue, useTransform, PanInfo } from 'framer-motion'
 
 interface MobileLayoutProps {
   children: React.ReactNode
@@ -19,12 +18,6 @@ export default function MobileLayout({
   onSwipeRight 
 }: MobileLayoutProps) {
   const [isMobile, setIsMobile] = useState(false)
-  const y = useMotionValue(0)
-  const x = useMotionValue(0)
-  
-  // Transform values for visual feedback
-  const opacity = useTransform(y, [-100, 0, 100], [0.5, 1, 0.5])
-  const scale = useTransform(y, [-100, 0, 100], [0.95, 1, 0.95])
 
   useEffect(() => {
     const checkMobile = () => {
@@ -35,61 +28,55 @@ export default function MobileLayout({
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    const swipeThreshold = 50
-    
-    if (Math.abs(info.offset.y) > Math.abs(info.offset.x)) {
-      // Vertical swipe
-      if (info.offset.y < -swipeThreshold && onSwipeUp) {
-        onSwipeUp()
-      } else if (info.offset.y > swipeThreshold && onSwipeDown) {
-        onSwipeDown()
-      }
-    } else {
-      // Horizontal swipe
-      if (info.offset.x < -swipeThreshold && onSwipeLeft) {
-        onSwipeLeft()
-      } else if (info.offset.x > swipeThreshold && onSwipeRight) {
-        onSwipeRight()
-      }
-    }
-  }
-
+  // On desktop, just render children normally
   if (!isMobile) {
     return <>{children}</>
   }
 
+  // On mobile, wrap in a scrollable container
   return (
-    <div className="mobile-wrapper">
-      {/* Mobile-optimized wrapper - removed motion.div to fix scrolling */}
-      <div className="min-h-screen bg-black text-white overflow-y-auto overflow-x-hidden">
-        {/* Safe area padding for notches */}
-        <div className="safe-top" />
-        
-        {/* Content */}
-        <div className="h-full pb-20">
-          {children}
-        </div>
-        
-        {/* Safe area padding for home indicators */}
-        <div className="safe-bottom" />
-      </div>
+    <div className="mobile-container">
+      {children}
       
       <style jsx>{`
-        .mobile-wrapper {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          overflow-y: auto;
-          -webkit-overflow-scrolling: touch;
+        .mobile-container {
+          width: 100%;
+          height: 100%;
+          overflow: visible;
         }
-        .safe-top {
-          padding-top: env(safe-area-inset-top);
-        }
-        .safe-bottom {
-          padding-bottom: env(safe-area-inset-bottom);
+        
+        /* Ensure body and html allow scrolling on mobile */
+        @media (max-width: 768px) {
+          :global(html),
+          :global(body) {
+            overflow-x: hidden !important;
+            overflow-y: auto !important;
+            height: auto !important;
+            width: 100% !important;
+            position: relative !important;
+          }
+          
+          :global(body) {
+            -webkit-overflow-scrolling: touch !important;
+            overscroll-behavior-y: auto !important;
+          }
+          
+          /* Fix for iOS bounce scrolling */
+          :global(.mobile-container) {
+            -webkit-overflow-scrolling: touch !important;
+          }
+          
+          /* Prevent fixed elements from blocking scroll */
+          :global(.mobile-nav) {
+            pointer-events: auto;
+          }
+          
+          /* Ensure main content is scrollable */
+          :global(main),
+          :global(.main-content) {
+            overflow: visible !important;
+            height: auto !important;
+          }
         }
       `}</style>
     </div>

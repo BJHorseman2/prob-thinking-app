@@ -250,30 +250,40 @@ html {
 
 /* Mobile-first optimizations */
 @media (max-width: 768px) {
-  /* Allow vertical scroll but prevent horizontal */
-  html {
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 100%;
+  /* Reset any problematic styles */
+  * {
+    -webkit-overflow-scrolling: touch !important;
   }
   
-  body {
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 100%;
-    position: relative;
+  /* Ensure proper scrolling */
+  html, body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
     min-height: 100vh;
+    width: 100%;
+    position: relative !important;
+    scroll-behavior: smooth;
+  }
+  
+  /* Fix for iOS rubber band scrolling */
+  body {
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Ensure main content doesn't get cut off */
+  main,
+  [role="main"],
+  .main-content {
+    min-height: 100vh;
+    padding-bottom: 100px; /* Space for mobile nav */
   }
   
   /* Better touch targets */
   button, a {
     min-height: 44px;
     min-width: 44px;
-  }
-  
-  /* Smooth scrolling */
-  * {
-    -webkit-overflow-scrolling: touch;
   }
   
   /* Prevent text selection on interactive elements */
@@ -294,30 +304,6 @@ html {
   
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  /* Optimize for one-handed use */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-  
-  /* Larger text for readability */
-  body {
-    font-size: 16px;
-  }
-  
-  /* Prevent zoom on input focus */
-  input, textarea, select {
-    font-size: 16px !important;
-  }
-  
-  /* Fix for mobile scrolling with fixed nav */
-  main {
-    padding-bottom: 80px; /* Space for fixed bottom nav */
   }
 }
 
@@ -421,10 +407,18 @@ html {
     padding: 8px 0;
     padding-bottom: calc(8px + env(safe-area-inset-bottom));
     z-index: 40;
+    /* Ensure nav doesn't block scroll */
+    pointer-events: auto;
+    touch-action: manipulation;
   }
   
   .desktop-nav {
     display: none;
+  }
+  
+  /* Ensure body has space for fixed nav */
+  body {
+    padding-bottom: 80px !important;
   }
 }
 
