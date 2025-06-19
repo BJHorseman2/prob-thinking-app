@@ -817,7 +817,8 @@ export default function Probabl() {
         }
       }}
     >
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white pb-32 md:pb-0 overflow-visible">
+    <div className="mobile-scroll-container">
+    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white pb-32 md:pb-0">
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-xl border-b border-white/10 animate-fadeIn">
         <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
@@ -1777,6 +1778,7 @@ export default function Probabl() {
           }}
         />
       )}
+    </div>
     </div>
     </MobileLayout>
   )

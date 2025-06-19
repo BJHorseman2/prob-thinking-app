@@ -25,60 +25,21 @@ export default function MobileLayout({
     }
     checkMobile()
     window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    
+    // Fix for iOS viewport height
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01
+      document.documentElement.style.setProperty('--vh', `${vh}px`)
+    }
+    setViewportHeight()
+    window.addEventListener('resize', setViewportHeight)
+    
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+      window.removeEventListener('resize', setViewportHeight)
+    }
   }, [])
 
-  // On desktop, just render children normally
-  if (!isMobile) {
-    return <>{children}</>
-  }
-
-  // On mobile, wrap in a scrollable container
-  return (
-    <div className="mobile-container">
-      {children}
-      
-      <style jsx>{`
-        .mobile-container {
-          width: 100%;
-          height: 100%;
-          overflow: visible;
-        }
-        
-        /* Ensure body and html allow scrolling on mobile */
-        @media (max-width: 768px) {
-          :global(html),
-          :global(body) {
-            overflow-x: hidden !important;
-            overflow-y: auto !important;
-            height: auto !important;
-            width: 100% !important;
-            position: relative !important;
-          }
-          
-          :global(body) {
-            -webkit-overflow-scrolling: touch !important;
-            overscroll-behavior-y: auto !important;
-          }
-          
-          /* Fix for iOS bounce scrolling */
-          :global(.mobile-container) {
-            -webkit-overflow-scrolling: touch !important;
-          }
-          
-          /* Prevent fixed elements from blocking scroll */
-          :global(.mobile-nav) {
-            pointer-events: auto;
-          }
-          
-          /* Ensure main content is scrollable */
-          :global(main),
-          :global(.main-content) {
-            overflow: visible !important;
-            height: auto !important;
-          }
-        }
-      `}</style>
-    </div>
-  )
+  // Always render children directly to avoid wrapper issues
+  return <>{children}</>
 } 
