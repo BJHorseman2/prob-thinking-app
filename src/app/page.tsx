@@ -13,6 +13,7 @@ import { getWeeklyChallenges, getNextWeeksChallenges, hasCompletedThisWeek, getD
 import SocialChallenge from '@/components/SocialChallenge'
 import ShareableResultCard from '@/components/ShareableResultCard'
 import TikTokChallenge from '@/components/TikTokChallenge'
+import ThemeToggle from '@/components/ThemeToggle'
 
 // Using localStorage for data persistence - no Supabase needed
 
@@ -820,6 +821,7 @@ export default function Probabl() {
             </div>
             
             <div className="flex items-center space-x-2 md:space-x-4">
+              <ThemeToggle />
               <AuthButton />
               {/* Social Features */}
               <div className="hidden md:flex items-center space-x-2">
