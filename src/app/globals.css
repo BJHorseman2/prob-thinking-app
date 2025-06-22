@@ -543,3 +543,25 @@ html {
 .hover-glow:hover {
   box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
 }
+
+/* New, robust mobile scrolling solution */
+@media (max-width: 768px) {
+  #scroll-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 80px; /* Space for fixed nav */
+  }
+}
+
+@media (min-width: 769px) {
+  #scroll-wrapper {
+    position: static;
+    overflow: visible;
+  }
+}

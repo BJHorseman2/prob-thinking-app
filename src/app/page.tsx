@@ -817,968 +817,968 @@ export default function Probabl() {
         }
       }}
     >
-    <div className="mobile-scroll-container">
-    <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
-      {/* Header */}
-      <div className="bg-black/20 backdrop-blur-xl border-b border-white/10 animate-fadeIn">
-        <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <motion.div 
-                className="text-xl md:text-2xl"
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, delay: 0.5 }}
-              >
-                🎯
-              </motion.div>
-              <div className="animate-slideInRight">
-                <h1 className="text-lg md:text-xl font-bold gradient-text-animate">
-                  Probabl
-                </h1>
-                <p className="hidden md:block text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <AuthButton />
-              {/* Social Features */}
-              <div className="hidden md:flex items-center space-x-2">
-                <SocialChallenge userScore={userScore} userName={userEmail || 'Player'} />
-                <ShareableResultCard 
-                  score={userScore} 
-                  rank={userRank} 
-                  topBias="Loss Aversion"
-                  accuracy={Math.round((badges.length / Object.keys(badgeSystem).length) * 100)}
-                  badges={badges}
-                />
-              </div>
-              <div className="hidden sm:flex items-center space-x-2 md:space-x-4" id="score-display">
-                <div className="text-center">
-                  <AnimatedScore 
-                    value={userScore} 
-                    prefix="$" 
-                    className="text-sm md:text-lg font-bold text-green-400"
-                  />
-                  <div className="text-xs text-gray-400">Score</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm md:text-lg font-bold text-yellow-400">
-                    {userRank ? `#${userRank}` : 'Unranked'}
+      <div id="scroll-wrapper">
+        <div className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-black text-white">
+          {/* Header */}
+          <div className="bg-black/20 backdrop-blur-xl border-b border-white/10 animate-fadeIn">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-2 md:space-x-4">
+                  <motion.div 
+                    className="text-xl md:text-2xl"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                  >
+                    🎯
+                  </motion.div>
+                  <div className="animate-slideInRight">
+                    <h1 className="text-lg md:text-xl font-bold gradient-text-animate">
+                      Probabl
+                    </h1>
+                    <p className="hidden md:block text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
                   </div>
-                  <div className="text-xs text-gray-400">Rank</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-sm md:text-lg font-bold text-orange-400">
-                    {streak > 0 ? `${streak}🔥` : '0'}
-                  </div>
-                  <div className="text-xs text-gray-400">Streak</div>
-                </div>
-                {activeTab === 'challenges' && gameMode === 'crowd' && (
-                  <div className="text-center">
-                    <div className="text-sm md:text-lg font-bold text-purple-400">{crowdBeats}🎯</div>
-                    <div className="text-xs text-gray-400">Crowd Beats</div>
-                  </div>
-                )}
-              </div>
-              {/* Mobile score only */}
-              <div className="sm:hidden text-center">
-                <div className="text-sm font-bold text-green-400">${userScore}</div>
-                <div className="text-xs text-gray-400">Score</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Challenge Mode Banner */}
-      {challengeMode && (
-        <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-6 text-center">
-          <p className="text-lg font-bold">
-            🎯 Challenge Mode Active! Beat {challengeMode.challengerName}'s score of {challengeMode.targetScore} points!
-          </p>
-          {userScore >= challengeMode.targetScore && (
-            <p className="text-sm mt-2">
-              🎉 Congratulations! You've beaten the challenge! Share your victory!
-            </p>
-          )}
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <AnimatePresence mode="wait">
-        {activeTab === 'home' && (
-          <motion.div 
-            className="max-w-6xl mx-auto px-4 md:px-8 py-12"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="text-center mb-16">
-              <div className="text-6xl mb-6 animate-float">🧠💰</div>
-              <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-fadeInUp">
-                Can You Beat Your Own Brain?
-              </h2>
-              <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto animate-fadeInUp stagger-1">
-                Predict the future. Outsmart cognitive biases. Earn legendary badges.
-                <br />
-                <span className="text-purple-400 font-semibold">Master the behavioral economics insights that win Nobel Prizes.</span>
-              </p>
-            
-            {/* Quick Demo */}
-            <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 max-w-2xl mx-auto mb-16">
-              <h3 className="text-2xl font-bold mb-6 text-center">⚡ Loss Aversion Demo</h3>
-              <div className="text-lg text-gray-300 mb-6">
-                <strong>"Would you rather have a guaranteed $500, or a 50% chance to win $1,100?"</strong>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <button 
-                  onClick={() => alert('❌ Classic loss aversion! The 50% bet has an expected value of $550, which is MORE than $500. But your brain hates the risk of getting nothing. This irrational fear costs investors millions! Nobel laureate Kahneman proved we feel losses twice as strongly as gains. +0 points, try the math!')}
-                  className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
-                >
-                  💵 Take $500
-                </button>
-                <button 
-                  onClick={() => alert('🎉 Brilliant! You did the math: 50% × $1,100 = $550 expected value, which beats $500. Most people can\'t do this - loss aversion makes them take the "safe" but WORSE option. You just demonstrated the kind of thinking that wins in markets! +75 points!')}
-                  className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
-                >
-                  🎲 Take the bet
-                </button>
-              </div>
-              
-              <div className="text-center">
-                <p className="text-sm text-gray-300 mb-4">
-                  👆 This tests <strong>System 1 vs System 2 thinking</strong> from Daniel Kahneman's Nobel Prize-winning work.
-                </p>
-                <button 
-                  onClick={() => setActiveTab('challenges')}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300"
-                >
-                  Play This Week's 4 Challenges 🧠
-                </button>
                 
-                {/* TikTok Mode Button - Mobile Only */}
-                <button 
-                  onClick={() => setShowTikTokMode(true)}
-                  className="md:hidden mt-4 bg-black border-2 border-white text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300 flex items-center justify-center space-x-2"
-                >
-                  <span>🎵</span>
-                  <span>TikTok Mode</span>
-                  <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">NEW</span>
-                </button>
+                <div className="flex items-center space-x-2 md:space-x-4">
+                  <AuthButton />
+                  {/* Social Features */}
+                  <div className="hidden md:flex items-center space-x-2">
+                    <SocialChallenge userScore={userScore} userName={userEmail || 'Player'} />
+                    <ShareableResultCard 
+                      score={userScore} 
+                      rank={userRank} 
+                      topBias="Loss Aversion"
+                      accuracy={Math.round((badges.length / Object.keys(badgeSystem).length) * 100)}
+                      badges={badges}
+                    />
+                  </div>
+                  <div className="hidden sm:flex items-center space-x-2 md:space-x-4" id="score-display">
+                    <div className="text-center">
+                      <AnimatedScore 
+                        value={userScore} 
+                        prefix="$" 
+                        className="text-sm md:text-lg font-bold text-green-400"
+                      />
+                      <div className="text-xs text-gray-400">Score</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm md:text-lg font-bold text-yellow-400">
+                        {userRank ? `#${userRank}` : 'Unranked'}
+                      </div>
+                      <div className="text-xs text-gray-400">Rank</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-sm md:text-lg font-bold text-orange-400">
+                        {streak > 0 ? `${streak}🔥` : '0'}
+                      </div>
+                      <div className="text-xs text-gray-400">Streak</div>
+                    </div>
+                    {activeTab === 'challenges' && gameMode === 'crowd' && (
+                      <div className="text-center">
+                        <div className="text-sm md:text-lg font-bold text-purple-400">{crowdBeats}🎯</div>
+                        <div className="text-xs text-gray-400">Crowd Beats</div>
+                      </div>
+                    )}
+                  </div>
+                  {/* Mobile score only */}
+                  <div className="sm:hidden text-center">
+                    <div className="text-sm font-bold text-green-400">${userScore}</div>
+                    <div className="text-xs text-gray-400">Score</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
 
-      {/* Desktop Navigation */}
-      <div className="desktop-nav flex justify-center space-x-2 mb-8 px-4 flex-wrap">
-        {[
-          { id: 'home', label: '🏠 Home' },
-          { id: 'challenges', label: '⚡ Quick Challenges' },
-          { id: 'markets', label: '📈 Live Markets' },
-          { id: 'progress', label: '📊 Progress' },
-          { id: 'badges', label: '🏆 Badge Collection' },
-          { id: 'leaderboard', label: '👑 Leaderboard' }
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-2 rounded-full text-sm transition-all duration-300 ${
-              activeTab === tab.id
-                ? 'bg-purple-500 text-white'
-                : 'text-gray-400 hover:text-white hover:bg-white/10'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Mobile Navigation */}
-      <div className="mobile-nav">
-        <div className="flex justify-around items-center w-full px-4">
-          {[
-            { id: 'home', icon: '🏠', label: 'Home' },
-            { id: 'challenges', icon: '⚡', label: 'Play' },
-            { id: 'markets', icon: '📈', label: 'Markets' },
-            { id: 'badges', icon: '🏆', label: 'Badges' },
-            { id: 'leaderboard', icon: '👑', label: 'Rank' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all ${
-                activeTab === tab.id
-                  ? 'text-purple-400'
-                  : 'text-gray-400'
-              }`}
-            >
-              <span className="text-xl mb-1">{tab.icon}</span>
-              <span className="text-xs">{tab.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Quick Challenges */}
-      {activeTab === 'challenges' && (
-        <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
-          <h2 className="text-3xl font-bold text-center mb-4">⚡ Behavioral Economics Challenges</h2>
-          <p className="text-center text-gray-300 mb-6">Test your brain against Nobel Prize winners Kahneman & Thaler, plus decision strategist Annie Duke.</p>
-          
-          {/* Mode Selector */}
-          <div className="flex justify-center mb-8">
-            <div className="bg-white/5 backdrop-blur-xl rounded-xl p-1 border border-white/10">
-              <button
-                onClick={() => setGameMode('solo')}
-                className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
-                  gameMode === 'solo'
-                    ? 'bg-purple-500 text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                🎯 Solo Training
-              </button>
-              <button
-                onClick={() => setGameMode('crowd')}
-                className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
-                  gameMode === 'crowd'
-                    ? 'bg-purple-500 text-white'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                👥 Beat the Crowd
-              </button>
-            </div>
-          </div>
-
-          {gameMode === 'crowd' && (
-            <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-xl p-4 mb-6 border border-purple-500/30">
-              <div className="text-center">
-                <h3 className="text-lg font-bold text-white mb-2">🔥 Beat the Crowd Mode</h3>
-                <p className="text-sm text-gray-300">
-                  See how your answers compare to other players. Beat the crowd to earn bonus points!
+          {/* Challenge Mode Banner */}
+          {challengeMode && (
+            <div className="bg-gradient-to-r from-pink-500 to-purple-500 text-white py-4 px-6 text-center">
+              <p className="text-lg font-bold">
+                🎯 Challenge Mode Active! Beat {challengeMode.challengerName}'s score of {challengeMode.targetScore} points!
+              </p>
+              {userScore >= challengeMode.targetScore && (
+                <p className="text-sm mt-2">
+                  🎉 Congratulations! You've beaten the challenge! Share your victory!
                 </p>
-              </div>
+              )}
             </div>
           )}
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {quickChallenges.map((challenge, index) => {
-              const isCompleted = completedChallenges.includes(challenge.id)
-              return (
-                <motion.div 
-                  key={challenge.id} 
-                  className={`
-                    bg-white/5 backdrop-blur-xl rounded-2xl p-6 border cursor-pointer hover-lift animate-scaleIn
-                    ${isCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 hover:border-purple-500/50 hover-glow'}
-                  `}
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => !isCompleted && setSelectedChallenge(challenge)}>
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-bold text-white">{challenge.title}</h3>
-                    <div className="flex items-center space-x-2">
-                      <span className="text-xs bg-purple-500/30 text-purple-300 px-2 py-1 rounded-full">+{challenge.points} pts</span>
-                      {isCompleted && <span className="text-green-400 text-lg">✅</span>}
-                    </div>
-                  </div>
-                  <p className="text-gray-300 mb-4">{challenge.description}</p>
-                  <div className="flex justify-between items-center text-sm text-gray-400">
-                    <span>⏱️ {challenge.timeToComplete}</span>
-                    <span className={`font-semibold ${isCompleted ? 'text-green-400' : 'text-purple-400'}`}>
-                      {isCompleted ? 'Completed' : 'Play →'}
-                    </span>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
 
-          {/* Weekly refresh notice */}
-          <div className="text-center mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
-            {allWeekCompleted ? (
-              <div>
-                <p className="text-sm text-green-400 font-semibold mb-2">
-                  ✅ Great job! You've completed all of this week's challenges!
-                </p>
-                <p className="text-sm text-gray-300">
-                  🔄 Come back in {getDaysUntilNextWeek()} days for 4 new behavioral economics puzzles.
-                </p>
-                <button 
-                  onClick={() => {
-                    const nextWeek = getNextWeeksChallenges()
-                    const titles = nextWeek.map((c: any) => c.title).join(', ')
-                    alert(`Next week's challenges: ${titles}`)
-                  }}
-                  className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
-                >
-                  Preview next week's challenges →
-                </button>
-              </div>
-            ) : (
-              <p className="text-sm text-gray-300">
-                🔄 Challenges refresh weekly every Monday. Complete all 4 challenges before the week ends!
-              </p>
-            )}
-          </div>
-
-          {/* Challenge Modal */}
-          <AnimatePresence>
-            {selectedChallenge && !showCrowdResults && (
+          {/* Hero Section */}
+          <AnimatePresence mode="wait">
+            {activeTab === 'home' && (
               <motion.div 
-                className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                className="max-w-6xl mx-auto px-4 md:px-8 py-12"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onClick={() => {
-                  setSelectedChallenge(null)
-                  setShowCrowdResults(false)
-                  setCrowdData(null)
-                  setLastResult(null)
-                }}
+                transition={{ duration: 0.5 }}
               >
-                <motion.div 
-                  className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  exit={{ scale: 0.9, opacity: 0 }}
-                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                  onClick={(e) => e.stopPropagation()}
-                >
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold">{selectedChallenge.title}</h3>
-                  <button onClick={() => {
-                    setSelectedChallenge(null)
-                    setShowCrowdResults(false)
-                    setCrowdData(null)
-                    setLastResult(null)
-                  }} className="text-gray-400 hover:text-white">✕</button>
-                </div>
+                <div className="text-center mb-16">
+                  <div className="text-6xl mb-6 animate-float">🧠💰</div>
+                  <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight animate-fadeInUp">
+                    Can You Beat Your Own Brain?
+                  </h2>
+                  <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-4xl mx-auto animate-fadeInUp stagger-1">
+                    Predict the future. Outsmart cognitive biases. Earn legendary badges.
+                    <br />
+                    <span className="text-purple-400 font-semibold">Master the behavioral economics insights that win Nobel Prizes.</span>
+                  </p>
                 
-                {gameMode === 'crowd' && (
-                  <div className="mb-4 p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
-                    <p className="text-sm text-purple-300">
-                      👥 {Math.floor(Math.random() * 20) + 15} people have already answered this question
-                    </p>
+                {/* Quick Demo */}
+                <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 border border-white/10 max-w-2xl mx-auto mb-16">
+                  <h3 className="text-2xl font-bold mb-6 text-center">⚡ Loss Aversion Demo</h3>
+                  <div className="text-lg text-gray-300 mb-6">
+                    <strong>"Would you rather have a guaranteed $500, or a 50% chance to win $1,100?"</strong>
                   </div>
-                )}
-                
-                <div className="mb-6">
-                  <p className="text-lg text-white mb-4">{selectedChallenge.question}</p>
                   
-                  {selectedChallenge.type === 'choice' && (
-                    <div className="space-y-3">
-                      {selectedChallenge.options.map((option: string) => (
-                        <button
-                          key={option}
-                          onClick={() => handleChallengeAnswer(selectedChallenge, option)}
-                          disabled={loading}
-                          className="w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left transition-all duration-300 disabled:opacity-50"
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {selectedChallenge.type === 'estimate' && (
-                    <div className="space-y-4">
-                      <input
-                        type="number"
-                        value={userAnswer}
-                        onChange={(e) => setUserAnswer(e.target.value)}
-                        className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center text-xl"
-                        placeholder="Enter your estimate"
-                        disabled={loading}
-                      />
-                      <button
-                        onClick={() => handleChallengeAnswer(selectedChallenge, userAnswer ? parseInt(userAnswer) : 0)}
-                        disabled={loading || !userAnswer || isNaN(Number(userAnswer))}
-                        className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-50"
-                      >
-                        {loading ? 'Processing...' : 'Submit Answer'}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-          {/* Betting Modal */}
-          {selectedBet && (
-            <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-              <div className="bg-gray-900 rounded-2xl p-6 max-w-md w-full border border-white/20">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-xl font-bold text-white">Place Bet</h3>
-                  <button onClick={() => setSelectedBet(null)} className="text-gray-400 hover:text-white">✕</button>
-                </div>
-                
-                <div className="mb-4">
-                  <h4 className="font-semibold text-white mb-2">{selectedBet.market.title}</h4>
-                  <div className="flex items-center space-x-2 mb-3">
-                    <span className="text-gray-300">Betting on:</span>
-                    <span className={`font-bold ${selectedBet.position === 'yes' ? 'text-green-400' : 'text-red-400'}`}>
-                      {selectedBet.position.toUpperCase()}
-                    </span>
-                    <span className="text-gray-300">at {Math.round((selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice) * 100)}¢</span>
-                  </div>
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    Bet Amount (Max: ${userScore})
-                  </label>
-                  <input
-                    type="number"
-                    value={betAmount}
-                    onChange={(e) => setBetAmount(e.target.value)}
-                    placeholder="Enter amount..."
-                    min="1"
-                    max={userScore}
-                    className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
-                  />
-                </div>
-
-                {betAmount && parseInt(betAmount) > 0 && (
-                  <div className="mb-4 p-3 bg-white/5 rounded-xl">
-                    <div className="text-sm text-gray-300">
-                      <div>Bet Amount: ${betAmount}</div>
-                      <div>Potential Win: ${Math.floor(parseInt(betAmount) / (selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice))}</div>
-                      <div>Profit if correct: ${Math.floor(parseInt(betAmount) / (selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice)) - parseInt(betAmount)}</div>
-                    </div>
-                  </div>
-                )}
-
-                <div className="flex space-x-3">
-                  <button
-                    onClick={() => handlePlaceBet(selectedBet.market, selectedBet.position)}
-                    disabled={!betAmount || parseInt(betAmount) <= 0 || parseInt(betAmount) > userScore}
-                    className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
-                  >
-                    Place Bet
-                  </button>
-                  <button
-                    onClick={() => setSelectedBet(null)}
-                    className="px-6 py-3 border border-white/20 text-white rounded-xl hover:bg-white/10 transition-all"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Crowd Results Modal */}
-          {showCrowdResults && crowdData && lastResult && selectedChallenge && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold">👥 Crowd Results</h3>
-                  <button onClick={() => {
-                    setShowCrowdResults(false)
-                    setSelectedChallenge(null)
-                    setCrowdData(null)
-                    setLoading(false)
-                    setUserAnswer('')
-                  }} className="text-gray-400 hover:text-white">✕</button>
-                </div>
-                
-                <div className="space-y-6">
-                  <div className="text-center p-4 bg-white/5 rounded-xl">
-                    <h4 className="text-lg font-bold mb-2">📊 {crowdData.participantCount} People Participated</h4>
-                  </div>
-
-                  {selectedChallenge.type === 'choice' && crowdData.distributions && (
-                    <div>
-                      <h4 className="text-lg font-bold mb-4">How the crowd voted:</h4>
-                      <div className="space-y-3">
-                        {crowdData.distributions.map((dist: any) => (
-                          <div key={dist.option} className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
-                            <span className={dist.option === selectedChallenge.correctAnswer ? 'text-green-400' : 'text-white'}>
-                              {dist.option}
-                            </span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-32 bg-gray-700 rounded-full h-2">
-                                <div 
-                                  className={`h-2 rounded-full ${dist.option === selectedChallenge.correctAnswer ? 'bg-green-400' : 'bg-gray-400'}`}
-                                  style={{ width: `${dist.percentage}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-sm">{dist.percentage}%</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 p-3 bg-yellow-500/20 rounded-xl border border-yellow-500/30">
-                        <p className="text-sm text-yellow-300">
-                          💭 Crowd choice: "{crowdData.crowdChoice}"
-                          {crowdData.crowdChoice === selectedChallenge.correctAnswer ? ' ✅ (Correct!)' : ' ❌ (Wrong!)'}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedChallenge.type === 'estimate' && crowdData.distribution && (
-                    <div>
-                      <h4 className="text-lg font-bold mb-4">Estimate Distribution:</h4>
-                      <div className="space-y-2">
-                        {crowdData.distribution.map((bucket: any, i: number) => (
-                          <div key={i} className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
-                            <span className="text-sm">{bucket.range}</span>
-                            <div className="flex items-center space-x-2">
-                              <div className="w-24 bg-gray-700 rounded-full h-2">
-                                <div 
-                                  className="h-2 rounded-full bg-blue-400"
-                                  style={{ width: `${(bucket.count / crowdData.participantCount) * 100}%` }}
-                                ></div>
-                              </div>
-                              <span className="text-xs">{bucket.count}</span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-4 p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
-                        <p className="text-sm text-blue-300">
-                          📊 Crowd average: {crowdData.crowdAverage}
-                          <br />
-                          🎯 Correct answer: {selectedChallenge.correctAnswer}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <h4 className="text-lg font-bold mb-3">💭 Top Reasoning from Participants:</h4>
-                    <div className="space-y-2">
-                      {crowdData.topReasons.map((reason: string, i: number) => (
-                        <div key={i} className="p-3 bg-white/5 rounded-xl">
-                          <p className="text-sm text-gray-300">"{reason}"</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Educational Explanation */}
-                  <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-4 border border-blue-500/30">
-                    <h4 className="text-lg font-bold mb-3 text-blue-300">🧠 The Science Behind This</h4>
-                    <p className="text-sm text-gray-300 leading-relaxed">
-                      {selectedChallenge.explanation}
-                    </p>
-                  </div>
-
-                  <div className="text-center pt-4">
-                    <div className="mb-4 p-4 bg-white/5 rounded-xl">
-                      <h4 className="text-lg font-bold mb-2">🎯 Your Result</h4>
-                      <p className="text-lg">
-                        <span className={`font-bold ${lastResult.points > lastResult.challengePoints * 0.7 ? 'text-green-400' : 'text-yellow-400'}`}>
-                          +{lastResult.points} points!
-                        </span>
-                        {lastResult.beatCrowd && (
-                          <span className="block text-purple-400 font-bold mt-2">
-                            🔥 CROWD BEAT! Bonus points earned!
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    
-                    <button
-                      onClick={() => {
-                        setShowCrowdResults(false)
-                        setSelectedChallenge(null)
-                        setCrowdData(null)
-                        setLastResult(null)
-                        setLoading(false)
-                        setUserAnswer('')
-                      }}
-                      className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold"
+                  <div className="grid grid-cols-2 gap-4 mb-6">
+                    <button 
+                      onClick={() => alert('❌ Classic loss aversion! The 50% bet has an expected value of $550, which is MORE than $500. But your brain hates the risk of getting nothing. This irrational fear costs investors millions! Nobel laureate Kahneman proved we feel losses twice as strongly as gains. +0 points, try the math!')}
+                      className="bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
                     >
-                      Continue
+                      💵 Take $500
+                    </button>
+                    <button 
+                      onClick={() => alert('🎉 Brilliant! You did the math: 50% × $1,100 = $550 expected value, which beats $500. Most people can\'t do this - loss aversion makes them take the "safe" but WORSE option. You just demonstrated the kind of thinking that wins in markets! +75 points!')}
+                      className="bg-green-500/20 hover:bg-green-500/30 border border-green-500/50 text-green-300 py-4 px-6 rounded-xl transition-all duration-300 font-semibold text-lg"
+                    >
+                      🎲 Take the bet
+                    </button>
+                  </div>
+                  
+                  <div className="text-center">
+                    <p className="text-sm text-gray-300 mb-4">
+                      👆 This tests <strong>System 1 vs System 2 thinking</strong> from Daniel Kahneman's Nobel Prize-winning work.
+                    </p>
+                    <button 
+                      onClick={() => setActiveTab('challenges')}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300"
+                    >
+                      Play This Week's 4 Challenges 🧠
+                    </button>
+                    
+                    {/* TikTok Mode Button - Mobile Only */}
+                    <button 
+                      onClick={() => setShowTikTokMode(true)}
+                      className="md:hidden mt-4 bg-black border-2 border-white text-white px-8 py-3 rounded-xl font-bold text-lg hover:scale-105 transform transition-all duration-300 flex items-center justify-center space-x-2"
+                    >
+                      <span>🎵</span>
+                      <span>TikTok Mode</span>
+                      <span className="text-xs bg-red-500 text-white px-2 py-1 rounded-full">NEW</span>
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
+            </motion.div>
           )}
+        </AnimatePresence>
+
+        {/* Desktop Navigation */}
+        <div className="desktop-nav flex justify-center space-x-2 mb-8 px-4 flex-wrap">
+          {[
+            { id: 'home', label: '🏠 Home' },
+            { id: 'challenges', label: '⚡ Quick Challenges' },
+            { id: 'markets', label: '📈 Live Markets' },
+            { id: 'progress', label: '📊 Progress' },
+            { id: 'badges', label: '🏆 Badge Collection' },
+            { id: 'leaderboard', label: '👑 Leaderboard' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 rounded-full text-sm transition-all duration-300 ${
+                activeTab === tab.id
+                  ? 'bg-purple-500 text-white'
+                  : 'text-gray-400 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-      )}
 
-      {/* Live Markets */}
-      {activeTab === 'markets' && (
-        <div className="max-w-6xl mx-auto px-4 md:px-8 pb-12">
-          <h2 className="text-3xl font-bold text-center mb-8">📈 Live Prediction Markets</h2>
-          <p className="text-center text-gray-300 mb-6">Predict real events. Compete with thousands. Win bigger badges.</p>
-          
-          {/* One prediction per market notice */}
-          <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
-            <p className="text-sm text-yellow-300 text-center">
-              ⚠️ <strong>Fair Play Rule:</strong> You can only make one prediction per market. Choose wisely!
-            </p>
+        {/* Mobile Navigation */}
+        <div className="mobile-nav">
+          <div className="flex justify-around items-center w-full px-4">
+            {[
+              { id: 'home', icon: '🏠', label: 'Home' },
+              { id: 'challenges', icon: '⚡', label: 'Play' },
+              { id: 'markets', icon: '📈', label: 'Markets' },
+              { id: 'badges', icon: '🏆', label: 'Badges' },
+              { id: 'leaderboard', icon: '👑', label: 'Rank' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex flex-col items-center justify-center py-2 px-3 rounded-lg transition-all ${
+                  activeTab === tab.id
+                    ? 'text-purple-400'
+                    : 'text-gray-400'
+                }`}
+              >
+                <span className="text-xl mb-1">{tab.icon}</span>
+                <span className="text-xs">{tab.label}</span>
+              </button>
+            ))}
           </div>
-          
-          <div className="space-y-6">
-            {liveMarkets.map((market) => {
-              const hasCompleted = completedMarkets.includes(market.id)
-              return (
-                <div key={market.id} className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border ${hasCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10'}`}>
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-lg font-bold text-white">{market.question}</h3>
-                    {hasCompleted && <span className="text-green-400 text-lg">✅</span>}
-                  </div>
-                  <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
-                    <span>⏰ {market.timeLeft}</span>
-                    <span>👥 {market.participants.toLocaleString()} players</span>
-                    <span>🎯 Avg: {market.averageGuess}%</span>
-                    <span className="text-green-400">🏆 {market.prize}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    {!hasCompleted ? (
-                      <button 
-                        onClick={() => {
-                          setSelectedMarket(market)
-                          setShowMarketModal(true)
-                        }}
-                        className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold"
-                      >
-                        Make Prediction
-                      </button>
-                    ) : (
-                      <span className="text-sm text-green-400 font-semibold">
-                        ✅ Prediction Submitted
+        </div>
+
+        {/* Quick Challenges */}
+        {activeTab === 'challenges' && (
+          <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
+            <h2 className="text-3xl font-bold text-center mb-4">⚡ Behavioral Economics Challenges</h2>
+            <p className="text-center text-gray-300 mb-6">Test your brain against Nobel Prize winners Kahneman & Thaler, plus decision strategist Annie Duke.</p>
+            
+            {/* Mode Selector */}
+            <div className="flex justify-center mb-8">
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-1 border border-white/10">
+                <button
+                  onClick={() => setGameMode('solo')}
+                  className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
+                    gameMode === 'solo'
+                      ? 'bg-purple-500 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  🎯 Solo Training
+                </button>
+                <button
+                  onClick={() => setGameMode('crowd')}
+                  className={`px-4 py-2 rounded-lg text-sm transition-all duration-300 ${
+                    gameMode === 'crowd'
+                      ? 'bg-purple-500 text-white'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  👥 Beat the Crowd
+                </button>
+              </div>
+            </div>
+
+            {gameMode === 'crowd' && (
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-xl p-4 mb-6 border border-purple-500/30">
+                <div className="text-center">
+                  <h3 className="text-lg font-bold text-white mb-2">🔥 Beat the Crowd Mode</h3>
+                  <p className="text-sm text-gray-300">
+                    See how your answers compare to other players. Beat the crowd to earn bonus points!
+                  </p>
+                </div>
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {quickChallenges.map((challenge, index) => {
+                const isCompleted = completedChallenges.includes(challenge.id)
+                return (
+                  <motion.div 
+                    key={challenge.id} 
+                    className={`
+                      bg-white/5 backdrop-blur-xl rounded-2xl p-6 border cursor-pointer hover-lift animate-scaleIn
+                      ${isCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10 hover:border-purple-500/50 hover-glow'}
+                    `}
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => !isCompleted && setSelectedChallenge(challenge)}>
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-lg font-bold text-white">{challenge.title}</h3>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs bg-purple-500/30 text-purple-300 px-2 py-1 rounded-full">+{challenge.points} pts</span>
+                        {isCompleted && <span className="text-green-400 text-lg">✅</span>}
+                      </div>
+                    </div>
+                    <p className="text-gray-300 mb-4">{challenge.description}</p>
+                    <div className="flex justify-between items-center text-sm text-gray-400">
+                      <span>⏱️ {challenge.timeToComplete}</span>
+                      <span className={`font-semibold ${isCompleted ? 'text-green-400' : 'text-purple-400'}`}>
+                        {isCompleted ? 'Completed' : 'Play →'}
                       </span>
-                    )}
-                    {market.yourLastGuess && (
-                      <span className="text-sm text-gray-400">Your last: {market.yourLastGuess}%</span>
-                    )}
-                  </div>
-                  {market.inspiration && (
-                    <div className="mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                      <p className="text-xs text-blue-300 italic">💡 {market.inspiration}</p>
                     </div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
+                  </motion.div>
+                )
+              })}
+            </div>
 
-          {/* Market Prediction Modal */}
-          {showMarketModal && selectedMarket && (
-            <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-              <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-2xl font-bold">📊 Make Your Prediction</h3>
-                  <button onClick={() => {
-                    setShowMarketModal(false)
-                    setSelectedMarket(null)
-                    setMarketPrediction('')
-                  }} className="text-gray-400 hover:text-white">✕</button>
+            {/* Weekly refresh notice */}
+            <div className="text-center mt-8 p-4 bg-white/5 rounded-xl border border-white/10">
+              {allWeekCompleted ? (
+                <div>
+                  <p className="text-sm text-green-400 font-semibold mb-2">
+                    ✅ Great job! You've completed all of this week's challenges!
+                  </p>
+                  <p className="text-sm text-gray-300">
+                    🔄 Come back in {getDaysUntilNextWeek()} days for 4 new behavioral economics puzzles.
+                  </p>
+                  <button 
+                    onClick={() => {
+                      const nextWeek = getNextWeeksChallenges()
+                      const titles = nextWeek.map((c: any) => c.title).join(', ')
+                      alert(`Next week's challenges: ${titles}`)
+                    }}
+                    className="mt-2 text-xs text-purple-400 hover:text-purple-300 underline"
+                  >
+                    Preview next week's challenges →
+                  </button>
                 </div>
-                
-                <div className="mb-6">
-                  <h4 className="text-lg font-bold text-white mb-2">{selectedMarket.question}</h4>
-                  <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <div className="text-gray-400">Time Left</div>
-                      <div className="font-bold text-white">⏰ {selectedMarket.timeLeft}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <div className="text-gray-400">Participants</div>
-                      <div className="font-bold text-white">👥 {selectedMarket.participants.toLocaleString()}</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <div className="text-gray-400">Crowd Average</div>
-                      <div className="font-bold text-white">📊 {selectedMarket.averageGuess}%</div>
-                    </div>
-                    <div className="bg-white/5 rounded-xl p-3">
-                      <div className="text-gray-400">Prize</div>
-                      <div className="font-bold text-green-400">{selectedMarket.prize}</div>
-                    </div>
+              ) : (
+                <p className="text-sm text-gray-300">
+                  🔄 Challenges refresh weekly every Monday. Complete all 4 challenges before the week ends!
+                </p>
+              )}
+            </div>
+
+            {/* Challenge Modal */}
+            <AnimatePresence>
+              {selectedChallenge && !showCrowdResults && (
+                <motion.div 
+                  className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onClick={() => {
+                    setSelectedChallenge(null)
+                    setShowCrowdResults(false)
+                    setCrowdData(null)
+                    setLastResult(null)
+                  }}
+                >
+                  <motion.div 
+                    className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full"
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.9, opacity: 0 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">{selectedChallenge.title}</h3>
+                    <button onClick={() => {
+                      setSelectedChallenge(null)
+                      setShowCrowdResults(false)
+                      setCrowdData(null)
+                      setLastResult(null)
+                    }} className="text-gray-400 hover:text-white">✕</button>
                   </div>
                   
+                  {gameMode === 'crowd' && (
+                    <div className="mb-4 p-3 bg-purple-500/20 rounded-xl border border-purple-500/30">
+                      <p className="text-sm text-purple-300">
+                        👥 {Math.floor(Math.random() * 20) + 15} people have already answered this question
+                      </p>
+                    </div>
+                  )}
+                  
                   <div className="mb-6">
+                    <p className="text-lg text-white mb-4">{selectedChallenge.question}</p>
+                    
+                    {selectedChallenge.type === 'choice' && (
+                      <div className="space-y-3">
+                        {selectedChallenge.options.map((option: string) => (
+                          <button
+                            key={option}
+                            onClick={() => handleChallengeAnswer(selectedChallenge, option)}
+                            disabled={loading}
+                            className="w-full p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-left transition-all duration-300 disabled:opacity-50"
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {selectedChallenge.type === 'estimate' && (
+                      <div className="space-y-4">
+                        <input
+                          type="number"
+                          value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center text-xl"
+                          placeholder="Enter your estimate"
+                          disabled={loading}
+                        />
+                        <button
+                          onClick={() => handleChallengeAnswer(selectedChallenge, userAnswer ? parseInt(userAnswer) : 0)}
+                          disabled={loading || !userAnswer || isNaN(Number(userAnswer))}
+                          className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-semibold disabled:opacity-50"
+                        >
+                          {loading ? 'Processing...' : 'Submit Answer'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+            {/* Betting Modal */}
+            {selectedBet && (
+              <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+                <div className="bg-gray-900 rounded-2xl p-6 max-w-md w-full border border-white/20">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-bold text-white">Place Bet</h3>
+                    <button onClick={() => setSelectedBet(null)} className="text-gray-400 hover:text-white">✕</button>
+                  </div>
+                  
+                  <div className="mb-4">
+                    <h4 className="font-semibold text-white mb-2">{selectedBet.market.title}</h4>
+                    <div className="flex items-center space-x-2 mb-3">
+                      <span className="text-gray-300">Betting on:</span>
+                      <span className={`font-bold ${selectedBet.position === 'yes' ? 'text-green-400' : 'text-red-400'}`}>
+                        {selectedBet.position.toUpperCase()}
+                      </span>
+                      <span className="text-gray-300">at {Math.round((selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice) * 100)}¢</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
                     <label className="block text-sm font-medium text-gray-300 mb-2">
-                      Your Prediction (0-100%)
+                      Bet Amount (Max: ${userScore})
                     </label>
                     <input
                       type="number"
-                      value={marketPrediction}
-                      onChange={(e) => setMarketPrediction(e.target.value)}
-                      min="0"
-                      max="100"
-                      className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center text-2xl"
-                      placeholder="Enter percentage"
+                      value={betAmount}
+                      onChange={(e) => setBetAmount(e.target.value)}
+                      placeholder="Enter amount..."
+                      min="1"
+                      max={userScore}
+                      className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
                     />
-                    <div className="mt-2 text-xs text-gray-400 text-center">
-                      The crowd average is {selectedMarket.averageGuess}%. Will you follow or diverge?
-                    </div>
                   </div>
-                  
-                  {selectedMarket.inspiration && (
-                    <div className="mb-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
-                      <p className="text-sm text-blue-300">💡 {selectedMarket.inspiration}</p>
+
+                  {betAmount && parseInt(betAmount) > 0 && (
+                    <div className="mb-4 p-3 bg-white/5 rounded-xl">
+                      <div className="text-sm text-gray-300">
+                        <div>Bet Amount: ${betAmount}</div>
+                        <div>Potential Win: ${Math.floor(parseInt(betAmount) / (selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice))}</div>
+                        <div>Profit if correct: ${Math.floor(parseInt(betAmount) / (selectedBet.position === 'yes' ? selectedBet.market.yesPrice : selectedBet.market.noPrice)) - parseInt(betAmount)}</div>
+                      </div>
                     </div>
                   )}
-                  
-                  <button
-                    onClick={handleMarketPrediction}
-                    disabled={!marketPrediction || isNaN(Number(marketPrediction))}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
-                  >
-                    Submit Prediction
-                  </button>
+
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => handlePlaceBet(selectedBet.market, selectedBet.position)}
+                      disabled={!betAmount || parseInt(betAmount) <= 0 || parseInt(betAmount) > userScore}
+                      className="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white px-6 py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
+                    >
+                      Place Bet
+                    </button>
+                    <button
+                      onClick={() => setSelectedBet(null)}
+                      className="px-6 py-3 border border-white/20 text-white rounded-xl hover:bg-white/10 transition-all"
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      )}
+            )}
 
-      {/* Badge Collection */}
-      {activeTab === 'badges' && (
-        <div className="max-w-6xl mx-auto px-4 md:px-8 pb-12">
-          <h2 className="text-3xl font-bold text-center mb-4">🏆 NFT Badge Collection</h2>
-          <p className="text-center text-gray-300 mb-8">
-            Earn exclusive NFT badges by mastering behavioral economics. These digital collectibles have no guaranteed monetary value.
-          </p>
-          
-          {/* User's Badge Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
-              <div className="text-2xl font-bold text-purple-400">{badges.length}</div>
-              <div className="text-sm text-gray-400">Badges Earned</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
-              <div className="text-2xl font-bold text-green-400">{mintedBadges.length}</div>
-              <div className="text-sm text-gray-400">NFTs Minted</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
-              <div className="text-2xl font-bold text-yellow-400">{crowdBeats}</div>
-              <div className="text-sm text-gray-400">Crowd Beats</div>
-            </div>
-            <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
-              <div className="text-2xl font-bold text-orange-400">{Math.round((badges.length / Object.keys(badgeSystem).length) * 100)}%</div>
-              <div className="text-sm text-gray-400">Collection</div>
-            </div>
-          </div>
+            {/* Crowd Results Modal */}
+            {showCrowdResults && crowdData && lastResult && selectedChallenge && (
+              <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">👥 Crowd Results</h3>
+                    <button onClick={() => {
+                      setShowCrowdResults(false)
+                      setSelectedChallenge(null)
+                      setCrowdData(null)
+                      setLoading(false)
+                      setUserAnswer('')
+                    }} className="text-gray-400 hover:text-white">✕</button>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <div className="text-center p-4 bg-white/5 rounded-xl">
+                      <h4 className="text-lg font-bold mb-2">📊 {crowdData.participantCount} People Participated</h4>
+                    </div>
 
-          {/* Badge Categories */}
-          {['Common', 'Uncommon', 'Rare', 'Legendary', 'Mythic'].map(rarity => {
-            const rarityBadges = Object.entries(badgeSystem).filter(([_, badge]) => badge.rarity === rarity)
-            const earnedCount = rarityBadges.filter(([id]) => badges.includes(id as BadgeId)).length
-            
-            return (
-              <div key={rarity} className="mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-bold text-white flex items-center space-x-2">
-                    <span className={`w-3 h-3 rounded-full ${
-                      rarity === 'Common' ? 'bg-gray-400' :
-                      rarity === 'Uncommon' ? 'bg-green-400' :
-                      rarity === 'Rare' ? 'bg-yellow-400' :
-                      rarity === 'Legendary' ? 'bg-purple-400' :
-                      'bg-pink-400'
-                    }`}></span>
-                    <span>{rarity} NFTs</span>
-                  </h3>
-                  <span className="text-sm text-gray-400">
-                    {earnedCount}/{rarityBadges.length} collected
-                  </span>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {rarityBadges.map(([badgeId, badge]) => {
-                    const isEarned = badges.includes(badgeId as BadgeId)
-                    const isMinted = mintedBadges.includes(badgeId)
-                    const progress = gameRules.badges[badgeId as BadgeId] ? 
-                      (gameRules.badges[badgeId as BadgeId]() ? 100 : Math.min(95, Math.random() * 60 + 20)) : 0
-                    
-                    return (
-                      <div key={badgeId} className={`
-                        bg-white/5 backdrop-blur-xl rounded-xl p-4 border transition-all duration-300 relative overflow-hidden
-                        ${isEarned ? (isMinted ? 'border-purple-500/50 bg-purple-500/10' : 'border-green-500/50 bg-green-500/10') : 'border-white/10'}
-                      `}>
-                        {isMinted && (
-                          <div className="absolute top-2 right-2">
-                            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-bold">
-                              NFT
-                            </div>
-                          </div>
-                        )}
-                        <div className="text-center">
-                          <div className={`text-4xl mb-2 ${isEarned ? (isMinted ? 'animate-pulse' : '') : 'grayscale opacity-50'}`}>
-                            {badge.emoji}
-                          </div>
-                          <h4 className="font-bold text-white mb-1">{badge.name}</h4>
-                          <p className="text-xs text-gray-400 mb-3">{badge.description}</p>
-                          
-                          {isEarned ? (
-                            <div className="space-y-2">
-                              {isMinted ? (
-                                <>
-                                  <div className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs">
-                                    ⛓️ Minted NFT
-                                  </div>
-                                  <div className="text-xs text-gray-400">
-                                    On-chain collectible
-                                  </div>
-                                </>
-                              ) : (
-                                <>
-                                  <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">
-                                    ✅ Earned
-                                  </div>
-                                  <button
-                                    onClick={() => {
-                                      setNewBadge(badge)
-                                      setShowBadgeModal(true)
-                                    }}
-                                    className="text-xs text-purple-400 hover:text-purple-300 underline"
-                                  >
-                                    Mint as NFT
-                                  </button>
-                                </>
-                              )}
-                            </div>
-                          ) : (
-                            <div className="space-y-2">
-                              <div className="w-full bg-gray-700 rounded-full h-2">
-                                <div 
-                                  className="h-2 bg-purple-500 rounded-full transition-all duration-300"
-                                  style={{ width: `${progress}%` }}
-                                ></div>
-                              </div>
-                              <div className="text-xs text-gray-400">
-                                {progress}% progress
+                    {selectedChallenge.type === 'choice' && crowdData.distributions && (
+                      <div>
+                        <h4 className="text-lg font-bold mb-4">How the crowd voted:</h4>
+                        <div className="space-y-3">
+                          {crowdData.distributions.map((dist: any) => (
+                            <div key={dist.option} className="flex justify-between items-center p-3 bg-white/5 rounded-xl">
+                              <span className={dist.option === selectedChallenge.correctAnswer ? 'text-green-400' : 'text-white'}>
+                                {dist.option}
+                              </span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-32 bg-gray-700 rounded-full h-2">
+                                  <div 
+                                    className={`h-2 rounded-full ${dist.option === selectedChallenge.correctAnswer ? 'bg-green-400' : 'bg-gray-400'}`}
+                                    style={{ width: `${dist.percentage}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-sm">{dist.percentage}%</span>
                               </div>
                             </div>
-                          )}
+                          ))}
+                        </div>
+                        <div className="mt-4 p-3 bg-yellow-500/20 rounded-xl border border-yellow-500/30">
+                          <p className="text-sm text-yellow-300">
+                            💭 Crowd choice: "{crowdData.crowdChoice}"
+                            {crowdData.crowdChoice === selectedChallenge.correctAnswer ? ' ✅ (Correct!)' : ' ❌ (Wrong!)'}
+                          </p>
                         </div>
                       </div>
-                    )
-                  })}
-                </div>
-                
-                {/* NFT Properties for this rarity */}
-                <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10">
-                  <div className="text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div><strong>Supply:</strong> {gameRules.nftProperties[rarity as RarityType].supply}</div>
-                    <div><strong>Transferable:</strong> {gameRules.nftProperties[rarity as RarityType].transferable ? '✅' : '❌'}</div>
-                    <div><strong>Stakeable:</strong> {gameRules.nftProperties[rarity as RarityType].stakeable ? '✅' : '❌'}</div>
-                    <div><strong>Value:</strong> Market determined only</div>
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
+                    )}
 
-      {/* Badge Earned Modal */}
-      {showBadgeModal && newBadge && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 max-w-md w-full text-center">
-            {!isMinting ? (
-              <>
-                <div className="text-6xl mb-4 animate-bounce">{newBadge.emoji}</div>
-                <h3 className="text-2xl font-bold text-white mb-2">🎉 Badge Earned!</h3>
-                <h4 className="text-xl text-purple-300 mb-4">{newBadge.name}</h4>
-                <p className="text-gray-300 mb-4">{newBadge.description}</p>
-                
-                <div className="bg-white/10 rounded-xl p-4 mb-6">
-                  <div className="text-sm text-gray-300 space-y-2">
-                    <div><strong>Rarity:</strong> <span className={`font-bold ${
-                      newBadge.rarity === 'Common' ? 'text-gray-400' :
-                      newBadge.rarity === 'Uncommon' ? 'text-green-400' :
-                      newBadge.rarity === 'Rare' ? 'text-yellow-400' :
-                      newBadge.rarity === 'Legendary' ? 'text-purple-400' :
-                      'text-pink-400'
-                    }`}>{newBadge.rarity}</span></div>
-                    <div><strong>Digital Collectible:</strong> No guaranteed monetary value</div>
-                    <div><strong>Bonus Points:</strong> <span className="text-green-400 font-bold">+{newBadge.points}</span></div>
-                    <div><strong>Power Level:</strong> <span className="text-blue-400">{newBadge.nftMetadata.power}</span></div>
+                    {selectedChallenge.type === 'estimate' && crowdData.distribution && (
+                      <div>
+                        <h4 className="text-lg font-bold mb-4">Estimate Distribution:</h4>
+                        <div className="space-y-2">
+                          {crowdData.distribution.map((bucket: any, i: number) => (
+                            <div key={i} className="flex justify-between items-center p-2 bg-white/5 rounded-lg">
+                              <span className="text-sm">{bucket.range}</span>
+                              <div className="flex items-center space-x-2">
+                                <div className="w-24 bg-gray-700 rounded-full h-2">
+                                  <div 
+                                    className="h-2 rounded-full bg-blue-400"
+                                    style={{ width: `${(bucket.count / crowdData.participantCount) * 100}%` }}
+                                  ></div>
+                                </div>
+                                <span className="text-xs">{bucket.count}</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="mt-4 p-3 bg-blue-500/20 rounded-xl border border-blue-500/30">
+                          <p className="text-sm text-blue-300">
+                            📊 Crowd average: {crowdData.crowdAverage}
+                            <br />
+                            🎯 Correct answer: {selectedChallenge.correctAnswer}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <h4 className="text-lg font-bold mb-3">💭 Top Reasoning from Participants:</h4>
+                      <div className="space-y-2">
+                        {crowdData.topReasons.map((reason: string, i: number) => (
+                          <div key={i} className="p-3 bg-white/5 rounded-xl">
+                            <p className="text-sm text-gray-300">"{reason}"</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Educational Explanation */}
+                    <div className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl p-4 border border-blue-500/30">
+                      <h4 className="text-lg font-bold mb-3 text-blue-300">🧠 The Science Behind This</h4>
+                      <p className="text-sm text-gray-300 leading-relaxed">
+                        {selectedChallenge.explanation}
+                      </p>
+                    </div>
+
+                    <div className="text-center pt-4">
+                      <div className="mb-4 p-4 bg-white/5 rounded-xl">
+                        <h4 className="text-lg font-bold mb-2">🎯 Your Result</h4>
+                        <p className="text-lg">
+                          <span className={`font-bold ${lastResult.points > lastResult.challengePoints * 0.7 ? 'text-green-400' : 'text-yellow-400'}`}>
+                            +{lastResult.points} points!
+                          </span>
+                          {lastResult.beatCrowd && (
+                            <span className="block text-purple-400 font-bold mt-2">
+                              🔥 CROWD BEAT! Bonus points earned!
+                            </span>
+                          )}
+                        </p>
+                      </div>
+                      
+                      <button
+                        onClick={() => {
+                          setShowCrowdResults(false)
+                          setSelectedChallenge(null)
+                          setCrowdData(null)
+                          setLastResult(null)
+                          setLoading(false)
+                          setUserAnswer('')
+                        }}
+                        className="bg-purple-500 hover:bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold"
+                      >
+                        Continue
+                      </button>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="space-y-3">
-                  <button
-                    onClick={handleMintBadge}
-                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300"
-                  >
-                    Mint NFT Badge 🎯
-                  </button>
-                  <button
-                    onClick={() => {
-                      setShowBadgeModal(false)
-                      setNewBadge(null)
-                    }}
-                    className="w-full text-gray-400 hover:text-white text-sm"
-                  >
-                    Skip for now
-                  </button>
-                </div>
-              </>
-            ) : (
-              <div className="py-8">
-                <div className="text-6xl mb-6 animate-spin">⚡</div>
-                <h3 className="text-2xl font-bold text-white mb-4">Minting Your NFT...</h3>
-                <div className="mb-6">
-                  <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
-                    <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse" style={{ width: '75%' }}></div>
-                  </div>
-                  <p className="text-sm text-gray-400">Simulating blockchain transaction...</p>
-                </div>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>🔗 Connecting to blockchain...</p>
-                  <p>📝 Creating metadata...</p>
-                  <p>🎨 Generating NFT artwork...</p>
-                  <p>⛓️ Confirming transaction...</p>
                 </div>
               </div>
             )}
           </div>
-        </div>
-      )}
-      {activeTab === 'leaderboard' && (
-        <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
-          <RealtimeLeaderboard />
-        </div>
-      )}
+        )}
 
-      {/* Progress Dashboard */}
-      {activeTab === 'progress' && (
-        <ProgressDashboard
-          userScore={userScore}
-          userRank={userRank}
-          streak={streak}
-          badges={badges}
-          crowdBeats={crowdBeats}
-          predictions={predictions}
-        />
-      )}
+        {/* Live Markets */}
+        {activeTab === 'markets' && (
+          <div className="max-w-6xl mx-auto px-4 md:px-8 pb-12">
+            <h2 className="text-3xl font-bold text-center mb-8">📈 Live Prediction Markets</h2>
+            <p className="text-center text-gray-300 mb-6">Predict real events. Compete with thousands. Win bigger badges.</p>
+            
+            {/* One prediction per market notice */}
+            <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-8 max-w-2xl mx-auto">
+              <p className="text-sm text-yellow-300 text-center">
+                ⚠️ <strong>Fair Play Rule:</strong> You can only make one prediction per market. Choose wisely!
+              </p>
+            </div>
+            
+            <div className="space-y-6">
+              {liveMarkets.map((market) => {
+                const hasCompleted = completedMarkets.includes(market.id)
+                return (
+                  <div key={market.id} className={`bg-white/5 backdrop-blur-xl rounded-2xl p-6 border ${hasCompleted ? 'border-green-500/50 bg-green-500/10' : 'border-white/10'}`}>
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-lg font-bold text-white">{market.question}</h3>
+                      {hasCompleted && <span className="text-green-400 text-lg">✅</span>}
+                    </div>
+                    <div className="flex items-center space-x-6 text-sm text-gray-400 mb-4">
+                      <span>⏰ {market.timeLeft}</span>
+                      <span>👥 {market.participants.toLocaleString()} players</span>
+                      <span>🎯 Avg: {market.averageGuess}%</span>
+                      <span className="text-green-400">🏆 {market.prize}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      {!hasCompleted ? (
+                        <button 
+                          onClick={() => {
+                            setSelectedMarket(market)
+                            setShowMarketModal(true)
+                          }}
+                          className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-2 rounded-xl font-semibold"
+                        >
+                          Make Prediction
+                        </button>
+                      ) : (
+                        <span className="text-sm text-green-400 font-semibold">
+                          ✅ Prediction Submitted
+                        </span>
+                      )}
+                      {market.yourLastGuess && (
+                        <span className="text-sm text-gray-400">Your last: {market.yourLastGuess}%</span>
+                      )}
+                    </div>
+                    {market.inspiration && (
+                      <div className="mt-4 p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                        <p className="text-xs text-blue-300 italic">💡 {market.inspiration}</p>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
 
-      {/* Onboarding Tutorial */}
-      <OnboardingTutorial />
+            {/* Market Prediction Modal */}
+            {showMarketModal && selectedMarket && (
+              <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                <div className="bg-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 max-w-2xl w-full">
+                  <div className="flex justify-between items-center mb-6">
+                    <h3 className="text-2xl font-bold">📊 Make Your Prediction</h3>
+                    <button onClick={() => {
+                      setShowMarketModal(false)
+                      setSelectedMarket(null)
+                      setMarketPrediction('')
+                    }} className="text-gray-400 hover:text-white">✕</button>
+                  </div>
+                  
+                  <div className="mb-6">
+                    <h4 className="text-lg font-bold text-white mb-2">{selectedMarket.question}</h4>
+                    <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-gray-400">Time Left</div>
+                        <div className="font-bold text-white">⏰ {selectedMarket.timeLeft}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-gray-400">Participants</div>
+                        <div className="font-bold text-white">👥 {selectedMarket.participants.toLocaleString()}</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-gray-400">Crowd Average</div>
+                        <div className="font-bold text-white">📊 {selectedMarket.averageGuess}%</div>
+                      </div>
+                      <div className="bg-white/5 rounded-xl p-3">
+                        <div className="text-gray-400">Prize</div>
+                        <div className="font-bold text-green-400">{selectedMarket.prize}</div>
+                      </div>
+                    </div>
+                    
+                    <div className="mb-6">
+                      <label className="block text-sm font-medium text-gray-300 mb-2">
+                        Your Prediction (0-100%)
+                      </label>
+                      <input
+                        type="number"
+                        value={marketPrediction}
+                        onChange={(e) => setMarketPrediction(e.target.value)}
+                        min="0"
+                        max="100"
+                        className="w-full p-4 bg-white/5 border border-white/10 rounded-xl text-white text-center text-2xl"
+                        placeholder="Enter percentage"
+                      />
+                      <div className="mt-2 text-xs text-gray-400 text-center">
+                        The crowd average is {selectedMarket.averageGuess}%. Will you follow or diverge?
+                      </div>
+                    </div>
+                    
+                    {selectedMarket.inspiration && (
+                      <div className="mb-4 p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                        <p className="text-sm text-blue-300">💡 {selectedMarket.inspiration}</p>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={handleMarketPrediction}
+                      disabled={!marketPrediction || isNaN(Number(marketPrediction))}
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-all"
+                    >
+                      Submit Prediction
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
-      {/* Achievement Toast */}
-      <AchievementToastComponent />
-      
-      {/* TikTok Mode */}
-      {showTikTokMode && (
-        <TikTokChallenge 
-          onComplete={(points) => {
-            setUserScore(prev => prev + points)
-            setShowTikTokMode(false)
-            alert(`🎉 TikTok Challenge Complete! +${points} points!`)
-          }}
-        />
-      )}
-    </div>
+        {/* Badge Collection */}
+        {activeTab === 'badges' && (
+          <div className="max-w-6xl mx-auto px-4 md:px-8 pb-12">
+            <h2 className="text-3xl font-bold text-center mb-4">🏆 NFT Badge Collection</h2>
+            <p className="text-center text-gray-300 mb-8">
+              Earn exclusive NFT badges by mastering behavioral economics. These digital collectibles have no guaranteed monetary value.
+            </p>
+            
+            {/* User's Badge Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-purple-400">{badges.length}</div>
+                <div className="text-sm text-gray-400">Badges Earned</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-green-400">{mintedBadges.length}</div>
+                <div className="text-sm text-gray-400">NFTs Minted</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-yellow-400">{crowdBeats}</div>
+                <div className="text-sm text-gray-400">Crowd Beats</div>
+              </div>
+              <div className="bg-white/5 backdrop-blur-xl rounded-xl p-4 text-center border border-white/10">
+                <div className="text-2xl font-bold text-orange-400">{Math.round((badges.length / Object.keys(badgeSystem).length) * 100)}%</div>
+                <div className="text-sm text-gray-400">Collection</div>
+              </div>
+            </div>
+
+            {/* Badge Categories */}
+            {['Common', 'Uncommon', 'Rare', 'Legendary', 'Mythic'].map(rarity => {
+              const rarityBadges = Object.entries(badgeSystem).filter(([_, badge]) => badge.rarity === rarity)
+              const earnedCount = rarityBadges.filter(([id]) => badges.includes(id as BadgeId)).length
+              
+              return (
+                <div key={rarity} className="mb-8">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-bold text-white flex items-center space-x-2">
+                      <span className={`w-3 h-3 rounded-full ${
+                        rarity === 'Common' ? 'bg-gray-400' :
+                        rarity === 'Uncommon' ? 'bg-green-400' :
+                        rarity === 'Rare' ? 'bg-yellow-400' :
+                        rarity === 'Legendary' ? 'bg-purple-400' :
+                        'bg-pink-400'
+                      }`}></span>
+                      <span>{rarity} NFTs</span>
+                    </h3>
+                    <span className="text-sm text-gray-400">
+                      {earnedCount}/{rarityBadges.length} collected
+                    </span>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {rarityBadges.map(([badgeId, badge]) => {
+                      const isEarned = badges.includes(badgeId as BadgeId)
+                      const isMinted = mintedBadges.includes(badgeId)
+                      const progress = gameRules.badges[badgeId as BadgeId] ? 
+                        (gameRules.badges[badgeId as BadgeId]() ? 100 : Math.min(95, Math.random() * 60 + 20)) : 0
+                      
+                      return (
+                        <div key={badgeId} className={`
+                          bg-white/5 backdrop-blur-xl rounded-xl p-4 border transition-all duration-300 relative overflow-hidden
+                          ${isEarned ? (isMinted ? 'border-purple-500/50 bg-purple-500/10' : 'border-green-500/50 bg-green-500/10') : 'border-white/10'}
+                        `}>
+                          {isMinted && (
+                            <div className="absolute top-2 right-2">
+                              <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                                NFT
+                              </div>
+                            </div>
+                          )}
+                          <div className="text-center">
+                            <div className={`text-4xl mb-2 ${isEarned ? (isMinted ? 'animate-pulse' : '') : 'grayscale opacity-50'}`}>
+                              {badge.emoji}
+                            </div>
+                            <h4 className="font-bold text-white mb-1">{badge.name}</h4>
+                            <p className="text-xs text-gray-400 mb-3">{badge.description}</p>
+                            
+                            {isEarned ? (
+                              <div className="space-y-2">
+                                {isMinted ? (
+                                  <>
+                                    <div className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-xs">
+                                      ⛓️ Minted NFT
+                                    </div>
+                                    <div className="text-xs text-gray-400">
+                                      On-chain collectible
+                                    </div>
+                                  </>
+                                ) : (
+                                  <>
+                                    <div className="bg-green-500/20 text-green-300 px-3 py-1 rounded-full text-xs">
+                                      ✅ Earned
+                                    </div>
+                                    <button
+                                      onClick={() => {
+                                        setNewBadge(badge)
+                                        setShowBadgeModal(true)
+                                      }}
+                                      className="text-xs text-purple-400 hover:text-purple-300 underline"
+                                    >
+                                      Mint as NFT
+                                    </button>
+                                  </>
+                                )}
+                              </div>
+                            ) : (
+                              <div className="space-y-2">
+                                <div className="w-full bg-gray-700 rounded-full h-2">
+                                  <div 
+                                    className="h-2 bg-purple-500 rounded-full transition-all duration-300"
+                                    style={{ width: `${progress}%` }}
+                                  ></div>
+                                </div>
+                                <div className="text-xs text-gray-400">
+                                  {progress}% progress
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                  
+                  {/* NFT Properties for this rarity */}
+                  <div className="mt-4 p-3 bg-white/5 rounded-xl border border-white/10">
+                    <div className="text-sm text-gray-300 grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div><strong>Supply:</strong> {gameRules.nftProperties[rarity as RarityType].supply}</div>
+                      <div><strong>Transferable:</strong> {gameRules.nftProperties[rarity as RarityType].transferable ? '✅' : '❌'}</div>
+                      <div><strong>Stakeable:</strong> {gameRules.nftProperties[rarity as RarityType].stakeable ? '✅' : '❌'}</div>
+                      <div><strong>Value:</strong> Market determined only</div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* Badge Earned Modal */}
+        {showBadgeModal && newBadge && (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 backdrop-blur-xl rounded-3xl p-8 border border-purple-500/30 max-w-md w-full text-center">
+              {!isMinting ? (
+                <>
+                  <div className="text-6xl mb-4 animate-bounce">{newBadge.emoji}</div>
+                  <h3 className="text-2xl font-bold text-white mb-2">🎉 Badge Earned!</h3>
+                  <h4 className="text-xl text-purple-300 mb-4">{newBadge.name}</h4>
+                  <p className="text-gray-300 mb-4">{newBadge.description}</p>
+                  
+                  <div className="bg-white/10 rounded-xl p-4 mb-6">
+                    <div className="text-sm text-gray-300 space-y-2">
+                      <div><strong>Rarity:</strong> <span className={`font-bold ${
+                        newBadge.rarity === 'Common' ? 'text-gray-400' :
+                        newBadge.rarity === 'Uncommon' ? 'text-green-400' :
+                        newBadge.rarity === 'Rare' ? 'text-yellow-400' :
+                        newBadge.rarity === 'Legendary' ? 'text-purple-400' :
+                        'text-pink-400'
+                      }`}>{newBadge.rarity}</span></div>
+                      <div><strong>Digital Collectible:</strong> No guaranteed monetary value</div>
+                      <div><strong>Bonus Points:</strong> <span className="text-green-400 font-bold">+{newBadge.points}</span></div>
+                      <div><strong>Power Level:</strong> <span className="text-blue-400">{newBadge.nftMetadata.power}</span></div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <button
+                      onClick={handleMintBadge}
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white px-8 py-3 rounded-xl font-semibold hover:scale-105 transition-all duration-300"
+                    >
+                      Mint NFT Badge 🎯
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowBadgeModal(false)
+                        setNewBadge(null)
+                      }}
+                      className="w-full text-gray-400 hover:text-white text-sm"
+                    >
+                      Skip for now
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="py-8">
+                  <div className="text-6xl mb-6 animate-spin">⚡</div>
+                  <h3 className="text-2xl font-bold text-white mb-4">Minting Your NFT...</h3>
+                  <div className="mb-6">
+                    <div className="w-full bg-gray-700 rounded-full h-2 mb-2">
+                      <div className="h-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse" style={{ width: '75%' }}></div>
+                    </div>
+                    <p className="text-sm text-gray-400">Simulating blockchain transaction...</p>
+                  </div>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <p>🔗 Connecting to blockchain...</p>
+                    <p>📝 Creating metadata...</p>
+                    <p>🎨 Generating NFT artwork...</p>
+                    <p>⛓️ Confirming transaction...</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {activeTab === 'leaderboard' && (
+          <div className="max-w-4xl mx-auto px-4 md:px-8 pb-12">
+            <RealtimeLeaderboard />
+          </div>
+        )}
+
+        {/* Progress Dashboard */}
+        {activeTab === 'progress' && (
+          <ProgressDashboard
+            userScore={userScore}
+            userRank={userRank}
+            streak={streak}
+            badges={badges}
+            crowdBeats={crowdBeats}
+            predictions={predictions}
+          />
+        )}
+
+        {/* Onboarding Tutorial */}
+        <OnboardingTutorial />
+
+        {/* Achievement Toast */}
+        <AchievementToastComponent />
+        
+        {/* TikTok Mode */}
+        {showTikTokMode && (
+          <TikTokChallenge 
+            onComplete={(points) => {
+              setUserScore(prev => prev + points)
+              setShowTikTokMode(false)
+              alert(`🎉 TikTok Challenge Complete! +${points} points!`)
+            }}
+          />
+        )}
+      </div>
     </div>
     </MobileLayout>
   )
