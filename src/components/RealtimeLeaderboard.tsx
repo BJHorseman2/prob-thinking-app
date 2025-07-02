@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { DataService } from '@/lib/dataService'
+import { isSupabaseConfigured } from '@/lib/supabase-client'
+import { useAuth } from '@/hooks/useAuth'
 
 interface LeaderboardEntry {
   id: string
@@ -17,6 +20,7 @@ export default function RealtimeLeaderboard() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [isRealtime, setIsRealtime] = useState(false)
+  const { user } = useAuth()
 
   // Mock data for when Supabase isn't configured
   const mockLeaderboard: LeaderboardEntry[] = [
@@ -28,20 +32,28 @@ export default function RealtimeLeaderboard() {
   ]
 
   useEffect(() => {
-    // Fetch leaderboard data from API
     const fetchLeaderboard = async () => {
       try {
-        const response = await fetch('/api/leaderboard')
-        if (response.ok) {
-          const data = await response.json()
-          setLeaderboard(data.leaderboard || mockLeaderboard)
-          setIsRealtime(false) // API doesn't support realtime
-        } else {
-          setLeaderboard(mockLeaderboard)
-        }
+        const data = await DataService.getLeaderboard(50)
+        
+        // Add rank and badge count
+        const rankedData = data.map((user, index) => ({
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          score: user.score,
+          rank: index + 1,
+          streak: user.streak,
+          crowd_beats: user.crowd_beats,
+          badge_count: 0 // TODO: Get actual badge count from DataService
+        }))
+
+        setLeaderboard(rankedData.length > 0 ? rankedData : mockLeaderboard)
+        setIsRealtime(isSupabaseConfigured && rankedData.length > 0)
       } catch (error) {
         console.error('Error fetching leaderboard:', error)
         setLeaderboard(mockLeaderboard)
+        setIsRealtime(false)
       } finally {
         setLoading(false)
       }
@@ -49,13 +61,34 @@ export default function RealtimeLeaderboard() {
 
     fetchLeaderboard()
 
-    // Refresh leaderboard every 30 seconds
-    const interval = setInterval(fetchLeaderboard, 30000)
+    // Set up real-time subscription if Supabase is configured
+    let channel: any = null
+    if (isSupabaseConfigured) {
+      const { supabase } = require('@/lib/supabase-client')
+      channel = supabase
+        ?.channel('leaderboard-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'user_profiles'
+          },
+          (_payload: any) => {
+            // Re-fetch leaderboard when any user profile changes
+            fetchLeaderboard()
+          }
+        )
+        .subscribe()
+    }
 
     return () => {
-      clearInterval(interval)
+      if (channel && isSupabaseConfigured) {
+        const { supabase } = require('@/lib/supabase-client')
+        supabase?.removeChannel(channel)
+      }
     }
-  }, [])
+  }, [user])
 
   if (loading) {
     return (

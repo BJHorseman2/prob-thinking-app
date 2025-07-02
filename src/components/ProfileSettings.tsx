@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { supabase, isSupabaseConfigured } from '@/lib/supabase-client'
 
 interface ProfileSettingsProps {
   userId: string
@@ -25,14 +26,23 @@ export default function ProfileSettings({ userId, currentUsername, onClose, onUp
       return
     }
 
+    if (!isSupabaseConfigured || !supabase) {
+      // Just update locally
+      onUpdate(username)
+      onClose()
+      return
+    }
+
     setLoading(true)
     setError('')
 
     try {
-      // Save to localStorage for now
-      const profiles = JSON.parse(localStorage.getItem('userProfiles') || '{}')
-      profiles[userId] = { username, updatedAt: new Date().toISOString() }
-      localStorage.setItem('userProfiles', JSON.stringify(profiles))
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ username })
+        .eq('id', userId)
+
+      if (error) throw error
 
       onUpdate(username)
       onClose()

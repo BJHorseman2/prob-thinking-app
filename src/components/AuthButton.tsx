@@ -1,58 +1,76 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function AuthButton() {
-  const [user, setUser] = useState<any>(null)
+  const { user, signIn, signUp, signOut, loading, isSupabaseConfigured } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [authError, setAuthError] = useState('')
+  const [isAuthLoading, setIsAuthLoading] = useState(false)
 
-  useEffect(() => {
-    // Check localStorage for user
-    const storedUser = localStorage.getItem('user')
-    if (storedUser) {
-      setUser(JSON.parse(storedUser))
-    }
-  }, [])
-
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     setAuthError('')
+    setIsAuthLoading(true)
+    
     if (!email || !password) {
       setAuthError('Please enter email and password')
+      setIsAuthLoading(false)
       return
     }
 
-    // Mock sign in - accept any email/password
-    const mockUser = { email, id: Date.now().toString() }
-    localStorage.setItem('user', JSON.stringify(mockUser))
-    setUser(mockUser)
-    setShowAuthModal(false)
-    setEmail('')
-    setPassword('')
+    const { error } = await signIn(email, password)
+    
+    if (error) {
+      setAuthError(error.message)
+    } else {
+      setShowAuthModal(false)
+      setEmail('')
+      setPassword('')
+    }
+    
+    setIsAuthLoading(false)
   }
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
     setAuthError('')
+    setIsAuthLoading(true)
+    
     if (!email || !password) {
       setAuthError('Please enter email and password')
+      setIsAuthLoading(false)
       return
     }
 
-    // Mock sign up - accept any email/password
-    const mockUser = { email, id: Date.now().toString() }
-    localStorage.setItem('user', JSON.stringify(mockUser))
-    setUser(mockUser)
-    setShowAuthModal(false)
-    setEmail('')
-    setPassword('')
+    const { error } = await signUp(email, password)
+    
+    if (error) {
+      setAuthError(error.message)
+    } else {
+      setShowAuthModal(false)
+      setEmail('')
+      setPassword('')
+      if (isSupabaseConfigured) {
+        setAuthError('')
+        // Show success message for email confirmation
+        alert('Check your email for the confirmation link!')
+      }
+    }
+    
+    setIsAuthLoading(false)
   }
 
-  const handleSignOut = () => {
-    localStorage.removeItem('user')
-    setUser(null)
+  const handleSignOut = async () => {
+    await signOut()
+  }
+
+  if (loading) {
+    return (
+      <div className="w-16 h-6 bg-white/10 rounded animate-pulse"></div>
+    )
   }
 
   return (
@@ -84,11 +102,13 @@ export default function AuthButton() {
               {isSignUp ? 'Create Account' : 'Sign In'}
             </h2>
             
-            <div className="mb-4 p-3 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
-              <p className="text-sm text-yellow-300">
-                ⚠️ Demo Mode - Any email/password works
-              </p>
-            </div>
+            {!isSupabaseConfigured && (
+              <div className="mb-4 p-3 bg-yellow-500/20 rounded-lg border border-yellow-500/30">
+                <p className="text-sm text-yellow-300">
+                  ⚠️ Demo Mode - Any email/password works
+                </p>
+              </div>
+            )}
             
             {authError && (
               <div className="mb-4 p-3 bg-red-500/20 rounded-lg">
@@ -114,9 +134,10 @@ export default function AuthButton() {
               
               <button
                 onClick={isSignUp ? handleSignUp : handleSignIn}
-                className="w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-lg font-semibold"
+                disabled={isAuthLoading}
+                className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-500/50 disabled:cursor-not-allowed text-white py-3 rounded-lg font-semibold transition-all"
               >
-                {isSignUp ? 'Sign Up' : 'Sign In'}
+                {isAuthLoading ? 'Loading...' : (isSignUp ? 'Sign Up' : 'Sign In')}
               </button>
               
               <div className="text-center">

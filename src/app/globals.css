@@ -1,36 +1,5 @@
 @import "tailwindcss";
 
-/* Mobile scrolling reset */
-* {
-  -webkit-tap-highlight-color: transparent;
-  -webkit-touch-callout: none;
-}
-
-/* Prevent iOS bounce on body - mobile only */
-@media (max-width: 768px) {
-  html {
-    position: fixed;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  body {
-    position: fixed;
-    height: 100%;
-    overflow: hidden;
-    width: 100%;
-    overscroll-behavior: none;
-  }
-}
-
-/* Desktop scrolling */
-@media (min-width: 769px) {
-  html, body {
-    height: 100%;
-    overflow: auto;
-  }
-}
-
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -281,32 +250,60 @@ html {
 
 /* Mobile-first optimizations */
 @media (max-width: 768px) {
-  html {
-    height: 100%;
-    overflow: hidden;
-  }
-  body {
-    height: 100%;
-    overflow-y: auto;
+  /* Prevent horizontal scroll */
+  html, body {
     overflow-x: hidden;
+    width: 100%;
+  }
+  
+  /* Better touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Smooth scrolling */
+  * {
     -webkit-overflow-scrolling: touch;
-    position: relative;
   }
-}
-
-.desktop-nav {
-  display: block;
-}
-.mobile-nav {
-  display: none;
-}
-@media (max-width: 768px) {
-  .desktop-nav {
-    display: none;
+  
+  /* Prevent text selection on interactive elements */
+  button, a {
+    -webkit-user-select: none;
+    user-select: none;
   }
-  .mobile-nav {
-    display: flex;
+  
+  /* Better tap highlighting */
+  button, a {
+    -webkit-tap-highlight-color: rgba(139, 92, 246, 0.2);
+  }
+  
+  /* Safe area support for notches */
+  .safe-area-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Optimize for one-handed use */
+  .bottom-nav {
     position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  
+  /* Larger text for readability */
+  body {
+    font-size: 16px;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, textarea, select {
+    font-size: 16px !important;
   }
 }
 
@@ -376,15 +373,6 @@ html {
   }
 }
 
-/* Mobile scroll container */
-@media (min-width: 769px) {
-  .mobile-scroll-container {
-    /* On desktop, act as a normal container */
-    position: relative;
-    overflow: visible;
-  }
-}
-
 /* Gradient text animation */
 .gradient-text-animate {
   background: linear-gradient(45deg, #8b5cf6, #ec4899, #3b82f6);
@@ -399,6 +387,31 @@ html {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* Mobile navigation */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 0;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+    z-index: 40;
+  }
+  
+  .desktop-nav {
+    display: none;
+  }
 }
 
 /* Animations */
@@ -463,26 +476,4 @@ html {
 
 .hover-glow:hover {
   box-shadow: 0 0 30px rgba(139, 92, 246, 0.5);
-}
-
-/* New, robust mobile scrolling solution */
-@media (max-width: 768px) {
-  #scroll-wrapper {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    padding-bottom: 80px; /* Space for fixed nav */
-  }
-}
-
-@media (min-width: 769px) {
-  #scroll-wrapper {
-    position: static;
-    overflow: visible;
-  }
 }
