@@ -19,7 +19,6 @@ import { useAuth } from '@/hooks/useAuth'
 import { LeaderboardService } from '@/lib/leaderboardService'
 import { DataService } from '@/lib/dataService'
 import FeedbackWidget from '@/components/FeedbackWidget'
-import ReactDebugTest from '@/components/ReactDebugTest'
 import { analytics, trackChallengeCompleted, trackBadgeEarned, trackUserRegistration } from '@/lib/analytics'
 
 // Using localStorage for data persistence
@@ -1930,9 +1929,6 @@ export default function Probabl() {
       
       {/* Feedback Widget */}
       <FeedbackWidget />
-      
-      {/* React Debug Test */}
-      <ReactDebugTest />
     </div>
     </MobileLayout>
   )
