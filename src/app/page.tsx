@@ -960,17 +960,18 @@ export default function Probabl() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2 md:space-x-4">
               <motion.div 
-                className="text-2xl md:text-4xl"
+                className="text-3xl md:text-5xl"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, delay: 0.5 }}
+                whileHover={{ scale: 1.1 }}
               >
                 🎯
               </motion.div>
               <div className="animate-slideInRight">
-                <h1 className="text-2xl md:text-3xl font-bold gradient-text-animate">
+                <h1 className="text-3xl md:text-4xl font-bold gradient-text-animate">
                   Probabl
                 </h1>
-                <p className="hidden md:block text-xs text-gray-300">Beat cognitive biases • Earn legendary badges</p>
+                <p className="hidden md:block text-sm text-gray-300 font-medium">Beat cognitive biases • Earn legendary badges</p>
               </div>
             </div>
             
@@ -1044,7 +1045,7 @@ export default function Probabl() {
         {activeTab === 'home' && (
           <motion.div 
             className="max-w-6xl mx-auto px-4 md:px-8 py-12"
-            initial={{ opacity: 0 }}
+            initial={{ opacity: 1 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
