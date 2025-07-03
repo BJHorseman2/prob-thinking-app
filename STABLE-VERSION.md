@@ -52,8 +52,9 @@ git reset --hard v1.0-stable-working
 ### Commit Information
 - **Tag**: v1.0-stable-working
 - **Branch**: stable-working-backup  
-- **Commit**: 81b8032 - "Fix React hydration issue with ClientOnly wrapper and proper SSR handling"
+- **Commit**: ac0e296 - "Remove React debug test button - no longer needed"
 - **Date**: 2025-07-03
+- **Production**: Deployed to probabl.xyz
 
 ### Development Notes
 This version was confirmed working after resolving a critical React hydration issue where buttons were rendering as static HTML without onClick handlers. The fix involved proper SSR/CSR separation and client-side rendering guards.
