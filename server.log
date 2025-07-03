@@ -163,3 +163,11 @@ Import trace for requested module:
  ○ Compiling /_error ...
  ✓ Compiled /_error in 548ms (2024 modules)
  GET / 200 in 182ms
+ ✓ Compiled in 96ms (1046 modules)
+ ✓ Compiled in 151ms (2024 modules)
+ ✓ Compiled in 156ms (2026 modules)
+ GET / 200 in 133ms
+ ✓ Compiled in 72ms (1046 modules)
+ ✓ Compiled in 132ms (1985 modules)
+ GET / 200 in 142ms
+ ✓ Compiled in 59ms (1047 modules)
