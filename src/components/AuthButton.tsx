@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 
 export default function AuthButton() {
-  const { user, signIn, signUp, signOut, loading, isSupabaseConfigured } = useAuth()
+  const { user, signIn, signUp, signOut, isSupabaseConfigured } = useAuth()
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
@@ -67,11 +67,12 @@ export default function AuthButton() {
     await signOut()
   }
 
-  if (loading) {
-    return (
-      <div className="w-16 h-6 bg-white/10 rounded animate-pulse"></div>
-    )
-  }
+  // Always show the button for now to debug
+  // if (loading && !forceShow) {
+  //   return (
+  //     <div className="w-16 h-6 bg-white/10 rounded animate-pulse"></div>
+  //   )
+  // }
 
   return (
     <>
