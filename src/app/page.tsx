@@ -79,6 +79,7 @@ export default function Probabl() {
   // Authentication
   const { user } = useAuth()
   
+  
   // All state variables
   const [activeTab, setActiveTab] = useState('home')
   const [userEmail, setUserEmail] = useState('')
@@ -1039,6 +1040,7 @@ export default function Probabl() {
           )}
         </div>
       )}
+
 
       {/* Hero Section */}
       <AnimatePresence mode="wait">
