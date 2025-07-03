@@ -18,6 +18,11 @@ export function useAuth() {
   useEffect(() => {
     // Get initial session
     const getInitialSession = async () => {
+      if (typeof window === 'undefined') {
+        setLoading(false)
+        return
+      }
+      
       if (isSupabaseConfigured) {
         const { data: { session } } = await supabase.auth.getSession()
         setSession(session)

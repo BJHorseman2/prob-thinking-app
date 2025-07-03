@@ -28,11 +28,15 @@ export default function MobileLayout({
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
+      if (typeof window !== 'undefined') {
+        setIsMobile(window.innerWidth < 768)
+      }
     }
     checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('resize', checkMobile)
+      return () => window.removeEventListener('resize', checkMobile)
+    }
   }, [])
 
   const handleDragEnd = (event: any, info: PanInfo) => {
